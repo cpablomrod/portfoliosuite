@@ -153,3 +153,18 @@ SERVER_EMAIL = config('SERVER_EMAIL', default='server@portfoliosuite.com')
 
 # Password reset settings
 PASSWORD_RESET_TIMEOUT = 3600  # 1 hour (in seconds)
+
+# Security Headers for XSS Protection
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+
+# Additional security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'

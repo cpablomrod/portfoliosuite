@@ -1089,10 +1089,21 @@
                             cursor: pointer;
                             border-bottom: 1px solid #eee;
                         `;
-                        option.innerHTML = `
-                            <strong>${result.symbol}</strong> - ${result.name}
-                            <br><small style="color: #666;">${result.type} • ${result.region}</small>
-                        `;
+                        // Safely create content to prevent XSS
+                        const symbolStrong = document.createElement('strong');
+                        symbolStrong.textContent = result.symbol;
+                        
+                        const nameSpan = document.createTextNode(' - ' + result.name);
+                        const lineBreak = document.createElement('br');
+                        
+                        const typeSmall = document.createElement('small');
+                        typeSmall.style.color = '#666';
+                        typeSmall.textContent = `${result.type} • ${result.region}`;
+                        
+                        option.appendChild(symbolStrong);
+                        option.appendChild(nameSpan);
+                        option.appendChild(lineBreak);
+                        option.appendChild(typeSmall);
                         
                         option.addEventListener('mouseenter', function() {
                             this.style.backgroundColor = '#f5f5f5';
