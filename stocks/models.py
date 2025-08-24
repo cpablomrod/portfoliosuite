@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
 from decimal import Decimal
 
 
@@ -43,6 +44,7 @@ class Portfolio(models.Model):
         ('SELL', 'Sell'),
     ]
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='portfolios', help_text="Owner of this portfolio transaction")
     portfolio_name = models.CharField(max_length=100, default='My Investment Portfolio', help_text="Name of the portfolio this transaction belongs to")
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name='transactions')
     transaction_type = models.CharField(max_length=4, choices=TRANSACTION_TYPES, default='BUY')

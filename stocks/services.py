@@ -46,16 +46,21 @@ class PortfolioAnalytics:
     """Service for portfolio analysis and metrics"""
     
     @staticmethod
-    def get_portfolio_summary(portfolio_name='My Investment Portfolio'):
-        """Get overall portfolio summary for a specific portfolio"""
+    def get_portfolio_summary(portfolio_name='My Investment Portfolio', user=None):
+        """Get overall portfolio summary for a specific portfolio and user"""
         from django.db.models import Sum, F, Q
         from .models import Portfolio
         
+        # Base queryset filtered by user
+        base_queryset = Portfolio.objects.all()
+        if user:
+            base_queryset = base_queryset.filter(user=user)
+        
         # Get all buy transactions for this portfolio
-        buy_transactions = Portfolio.objects.filter(transaction_type='BUY', portfolio_name=portfolio_name)
+        buy_transactions = base_queryset.filter(transaction_type='BUY', portfolio_name=portfolio_name)
         
         # Get all sell transactions for this portfolio
-        sell_transactions = Portfolio.objects.filter(transaction_type='SELL', portfolio_name=portfolio_name)
+        sell_transactions = base_queryset.filter(transaction_type='SELL', portfolio_name=portfolio_name)
         
         # Calculate total invested (buys) and total received (sells)
         total_invested = buy_transactions.aggregate(
@@ -68,47 +73,57 @@ class PortfolioAnalytics:
         
         # Get unique companies in current portfolio (only companies with current positions)
         # We need to count companies that have positive net positions
-        current_positions = PortfolioAnalytics.get_stock_positions(portfolio_name)
+        current_positions = PortfolioAnalytics.get_stock_positions(portfolio_name, user)
         companies_count = len(current_positions)
+        
+        # Total transactions count for this user
+        total_transactions_count = base_queryset.filter(portfolio_name=portfolio_name).count()
         
         return {
             'total_invested': total_invested,
             'total_received': total_received,
             'net_invested': total_invested - total_received,
             'companies_count': companies_count,
-            'total_transactions': Portfolio.objects.filter(portfolio_name=portfolio_name).count()
+            'total_transactions': total_transactions_count
         }
     
     @staticmethod
-    def get_stock_positions(portfolio_name='My Investment Portfolio'):
-        """Get current stock positions for a specific portfolio"""
+    def get_stock_positions(portfolio_name='My Investment Portfolio', user=None):
+        """Get current stock positions for a specific portfolio and user"""
         from django.db.models import Sum, F
         from .models import Portfolio
         
+        # Base queryset filtered by user
+        base_queryset = Portfolio.objects.all()
+        if user:
+            base_queryset = base_queryset.filter(user=user)
+        
         # Calculate net positions for each stock in this portfolio
         positions = []
-        stocks = Portfolio.objects.filter(portfolio_name=portfolio_name).values('stock__symbol', 'stock__company_name').distinct()
+        stocks = base_queryset.filter(portfolio_name=portfolio_name).values('stock__symbol', 'stock__company_name').distinct()
         
         for stock_info in stocks:
             symbol = stock_info['stock__symbol']
             company_name = stock_info['stock__company_name']
             
-            # Calculate total bought
-            bought = Portfolio.objects.filter(
+            # Calculate total bought (filter by user)
+            bought_queryset = base_queryset.filter(
                 stock__symbol=symbol,
                 transaction_type='BUY',
                 portfolio_name=portfolio_name
-            ).aggregate(
+            )
+            bought = bought_queryset.aggregate(
                 total_quantity=Sum('quantity'),
                 total_value=Sum(F('quantity') * F('price_per_share'))
             )
             
-            # Calculate total sold
-            sold = Portfolio.objects.filter(
+            # Calculate total sold (filter by user)
+            sold_queryset = base_queryset.filter(
                 stock__symbol=symbol,
                 transaction_type='SELL',
                 portfolio_name=portfolio_name
-            ).aggregate(
+            )
+            sold = sold_queryset.aggregate(
                 total_quantity=Sum('quantity'),
                 total_value=Sum(F('quantity') * F('price_per_share'))
             )
@@ -131,7 +146,7 @@ class PortfolioAnalytics:
         return positions
     
     @staticmethod
-    def get_detailed_holdings(portfolio_name='My Investment Portfolio'):
+    def get_detailed_holdings(portfolio_name='My Investment Portfolio', user=None):
         """Get detailed holdings information for the table"""
         from django.db.models import Sum, F, Min
         from django.utils import timezone
@@ -140,8 +155,13 @@ class PortfolioAnalytics:
         
         holdings = []
         
+        # Base queryset filtered by user
+        base_queryset = Portfolio.objects.all()
+        if user:
+            base_queryset = base_queryset.filter(user=user)
+        
         # Get all stocks with transactions for this portfolio
-        stocks_with_transactions = Portfolio.objects.filter(
+        stocks_with_transactions = base_queryset.filter(
             portfolio_name=portfolio_name
         ).values(
             'stock__symbol', 
@@ -150,7 +170,7 @@ class PortfolioAnalytics:
         
         # Calculate total portfolio value for weight calculation
         total_portfolio_value = Decimal('0')
-        positions = PortfolioAnalytics.get_stock_positions(portfolio_name)
+        positions = PortfolioAnalytics.get_stock_positions(portfolio_name, user)
         
         for position in positions:
             # Get current price
@@ -171,10 +191,11 @@ class PortfolioAnalytics:
             if not position or position['quantity'] <= 0:
                 continue
             
-            # Get first purchase date
-            first_purchase = Portfolio.objects.filter(
+            # Get first purchase date (filter by user)
+            first_purchase = base_queryset.filter(
                 stock__symbol=symbol,
-                transaction_type='BUY'
+                transaction_type='BUY',
+                portfolio_name=portfolio_name
             ).order_by('transaction_date').first()
             
             # Get current price
@@ -227,14 +248,14 @@ class PortfolioAnalytics:
         return holdings
     
     @staticmethod
-    def get_upcoming_earnings(portfolio_name='My Investment Portfolio'):
+    def get_upcoming_earnings(portfolio_name='My Investment Portfolio', user=None):
         """Get upcoming earnings dates for portfolio stocks"""
         from django.utils import timezone
         from datetime import timedelta, datetime
         from .models import Portfolio
         
         # Get current positions for this portfolio
-        positions = PortfolioAnalytics.get_stock_positions(portfolio_name)
+        positions = PortfolioAnalytics.get_stock_positions(portfolio_name, user)
         
         if not positions:
             return []
@@ -340,14 +361,14 @@ class PortfolioAnalytics:
         return earnings  # Return all earnings dates
     
     @staticmethod
-    def get_upcoming_dividends(portfolio_name='My Investment Portfolio'):
+    def get_upcoming_dividends(portfolio_name='My Investment Portfolio', user=None):
         """Get upcoming dividend information for portfolio stocks"""
         from django.utils import timezone
         from datetime import timedelta, datetime
         from .models import Portfolio
         
         # Get current positions for this portfolio
-        positions = PortfolioAnalytics.get_stock_positions(portfolio_name)
+        positions = PortfolioAnalytics.get_stock_positions(portfolio_name, user)
         
         if not positions:
             return []

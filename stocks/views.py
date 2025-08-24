@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -15,19 +16,20 @@ from .forms import AddTransactionForm, SimulationForm
 from .services import StockDataService, PortfolioAnalytics
 
 
+@login_required
 def dashboard(request):
     """Main dashboard view"""
     # Get current portfolio name from session or use default
     current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
     
-    # Get portfolio summary for current portfolio
-    summary = PortfolioAnalytics.get_portfolio_summary(current_portfolio)
+    # Get portfolio summary for current portfolio (filtered by user)
+    summary = PortfolioAnalytics.get_portfolio_summary(current_portfolio, request.user)
     
-    # Get current positions for current portfolio
-    positions = PortfolioAnalytics.get_stock_positions(current_portfolio)
+    # Get current positions for current portfolio (filtered by user)
+    positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
     
-    # Get recent transactions
-    recent_transactions = Portfolio.objects.select_related('stock').order_by('-created_at')[:10]
+    # Get recent transactions (filtered by user)
+    recent_transactions = Portfolio.objects.filter(user=request.user).select_related('stock').order_by('-created_at')[:10]
     
     # Get current prices for positions - ALWAYS refresh prices on page load
     data_service = StockDataService()
@@ -114,17 +116,17 @@ def dashboard(request):
     
     # Price updates are fetched silently without notifications
     
-    # Get detailed holdings for the table
-    detailed_holdings = PortfolioAnalytics.get_detailed_holdings(current_portfolio)
+    # Get detailed holdings for the table (filtered by user)
+    detailed_holdings = PortfolioAnalytics.get_detailed_holdings(current_portfolio, request.user)
     
-    # Get upcoming earnings
-    upcoming_earnings = PortfolioAnalytics.get_upcoming_earnings()
+    # Get upcoming earnings (filtered by user)
+    upcoming_earnings = PortfolioAnalytics.get_upcoming_earnings(current_portfolio, request.user)
     
-    # Get upcoming dividends
-    upcoming_dividends = PortfolioAnalytics.get_upcoming_dividends()
+    # Get upcoming dividends (filtered by user)
+    upcoming_dividends = PortfolioAnalytics.get_upcoming_dividends(current_portfolio, request.user)
     
-    # Get all available portfolio names
-    available_portfolios = Portfolio.objects.values_list('portfolio_name', flat=True).distinct().order_by('portfolio_name')
+    # Get all available portfolio names (filtered by user)
+    available_portfolios = Portfolio.objects.filter(user=request.user).values_list('portfolio_name', flat=True).distinct().order_by('portfolio_name')
     
     # Forms
     transaction_form = AddTransactionForm()
@@ -144,6 +146,7 @@ def dashboard(request):
     return render(request, 'stocks/dashboard.html', context)
 
 
+@login_required
 @require_http_methods(["POST"])
 def add_transaction(request):
     """Add a new transaction"""
@@ -151,7 +154,7 @@ def add_transaction(request):
     if form.is_valid():
         # Get current portfolio name from session
         current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
-        transaction = form.save(portfolio_name=current_portfolio)
+        transaction = form.save(portfolio_name=current_portfolio, user=request.user)
         messages.success(request, f'Transaction added: {transaction.transaction_type} {transaction.quantity} {transaction.stock.symbol}')
     else:
         for field, errors in form.errors.items():
@@ -161,13 +164,14 @@ def add_transaction(request):
     return redirect('dashboard')
 
 
+@login_required
 @require_http_methods(["POST"])
 def update_prices(request):
     """Update stock prices using free APIs (no API key required)"""
     symbols = request.POST.getlist('symbols')
     if not symbols:
-        # Get all symbols from current positions
-        symbols = Portfolio.objects.values_list('stock__symbol', flat=True).distinct()
+        # Get all symbols from current user's positions
+        symbols = Portfolio.objects.filter(user=request.user).values_list('stock__symbol', flat=True).distinct()
     
     data_service = StockDataService()
     updated_count = 0
@@ -187,6 +191,7 @@ def update_prices(request):
     return redirect('dashboard')
 
 
+@login_required
 @require_http_methods(["POST"])
 def run_simulation(request):
     """Run a historical simulation"""
@@ -295,6 +300,7 @@ def _run_historical_simulation(symbols, start_date, end_date, initial_investment
     }
 
 
+@login_required
 def chart_data(request):
     """Provide chart data for portfolio performance"""
     period = request.GET.get('period', '1D')
@@ -305,8 +311,8 @@ def chart_data(request):
         # Get current portfolio name from session
         current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
         
-        # Get all stocks in current portfolio
-        positions = PortfolioAnalytics.get_stock_positions(current_portfolio)
+        # Get all stocks in current portfolio (filtered by user)
+        positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
         
         if not positions:
             # Return sample data if no portfolio exists
@@ -842,14 +848,15 @@ def _get_sample_chart_data(period, chart_type='portfolio', symbol=None):
         }
 
 
+@login_required
 def performance_since_inception_data(request):
     """Provide performance data for individual stocks since their inception in portfolio"""
     try:
         # Get current portfolio name from session
         current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
         
-        # Get current positions
-        positions = PortfolioAnalytics.get_stock_positions(current_portfolio)
+        # Get current positions (filtered by user)
+        positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
         
         if not positions:
             return JsonResponse({'datasets': [], 'labels': []})
@@ -1166,6 +1173,7 @@ def get_stock_price(request):
         })
 
 
+@login_required
 @require_http_methods(["GET"])
 def sector_allocation_data(request):
     """Provide sector allocation data for pie chart"""
@@ -1173,8 +1181,8 @@ def sector_allocation_data(request):
         # Get current portfolio name from session
         current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
         
-        # Get current positions
-        positions = PortfolioAnalytics.get_stock_positions(current_portfolio)
+        # Get current positions (filtered by user)
+        positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
         
         if not positions:
             return JsonResponse({'sectors': [], 'labels': [], 'values': []})
@@ -1284,34 +1292,36 @@ def sector_allocation_data(request):
             'total_value': 11500
         })
 
-@require_http_methods(["POST"])
+@login_required
 def change_portfolio(request):
     """Change the current portfolio name"""
-    new_portfolio_name = request.POST.get('portfolio_name', '').strip()
-    
-    if not new_portfolio_name:
-        messages.error(request, 'Portfolio name cannot be empty')
-    else:
-        # Update session with new portfolio name
-        request.session['current_portfolio'] = new_portfolio_name
-        messages.success(request, f'Switched to portfolio: {new_portfolio_name}')
+    if request.method == 'POST':
+        new_portfolio_name = request.POST.get('portfolio_name', '').strip()
+        
+        if not new_portfolio_name:
+            messages.error(request, 'Portfolio name cannot be empty')
+        else:
+            # Update session with new portfolio name
+            request.session['current_portfolio'] = new_portfolio_name
+            messages.success(request, f'Switched to portfolio: {new_portfolio_name}')
     
     return redirect('dashboard')
 
 
+@login_required
 def generate_portfolio_report(request):
     """Generate PDF report of portfolio transactions"""
     # Get current portfolio name from session
     current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
     
-    # Get all transactions for current portfolio
-    transactions = Portfolio.objects.filter(portfolio_name=current_portfolio).select_related('stock').order_by('-transaction_date', '-created_at')
+    # Get all transactions for current portfolio (filtered by user)
+    transactions = Portfolio.objects.filter(user=request.user, portfolio_name=current_portfolio).select_related('stock').order_by('-transaction_date', '-created_at')
     
-    # Get portfolio summary
-    summary = PortfolioAnalytics.get_portfolio_summary(current_portfolio)
+    # Get portfolio summary (filtered by user)
+    summary = PortfolioAnalytics.get_portfolio_summary(current_portfolio, request.user)
     
-    # Get current positions
-    positions = PortfolioAnalytics.get_stock_positions(current_portfolio)
+    # Get current positions (filtered by user)
+    positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
     
     # Create PDF buffer
     buffer = BytesIO()

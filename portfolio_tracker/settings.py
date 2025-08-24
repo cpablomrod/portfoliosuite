@@ -56,7 +56,7 @@ ROOT_URLCONF = 'portfolio_tracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,3 +125,31 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # No external API keys required - using free data sources
+
+# Authentication settings
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Email configuration for password reset
+# Use real email backend for sending actual emails
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+
+# Gmail SMTP configuration (you can change this to any email provider)
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# Fallback to console backend if no email credentials provided
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    print('⚠️  No email credentials found. Using console backend for development.')
+
+# Default email settings
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@portfoliosuite.com')
+SERVER_EMAIL = config('SERVER_EMAIL', default='server@portfoliosuite.com')
+
+# Password reset settings
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour (in seconds)

@@ -59,7 +59,7 @@ class AddTransactionForm(forms.ModelForm):
             raise forms.ValidationError("Stock symbol is required")
         return symbol
     
-    def save(self, portfolio_name='My Investment Portfolio', commit=True):
+    def save(self, portfolio_name='My Investment Portfolio', user=None, commit=True):
         instance = super().save(commit=False)
         
         # Get or create the stock based on the symbol
@@ -69,6 +69,10 @@ class AddTransactionForm(forms.ModelForm):
             defaults={'company_name': ''}
         )
         instance.stock = stock
+        
+        # Set the user (required)
+        if user:
+            instance.user = user
         
         # Set the portfolio name
         instance.portfolio_name = portfolio_name

@@ -230,6 +230,101 @@
             text-align: center;
         }
         
+        .user-menu {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+        }
+        
+        .user-avatar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+        
+        .user-dropdown {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+            min-width: 220px;
+            padding: 8px 0;
+            margin-top: 8px;
+        }
+        
+        .user-dropdown-header {
+            padding: 12px 20px 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+        
+        .user-dropdown-header .user-name {
+            font-weight: 600;
+            color: var(--text-primary) !important;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        .user-dropdown-header .user-email {
+            font-size: 0.8rem;
+            color: var(--text-secondary) !important;
+            margin: 2px 0 0 0;
+        }
+        
+        .user-dropdown .dropdown-item {
+            padding: 10px 20px;
+            color: var(--text-primary) !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+        
+        .user-dropdown .dropdown-item:hover {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .user-dropdown .dropdown-item i {
+            width: 18px;
+            margin-right: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .user-dropdown .dropdown-item.text-danger {
+            color: var(--danger-color) !important;
+        }
+        
+        .user-dropdown .dropdown-item.text-danger:hover {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+        
+        .user-dropdown .dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 8px 0;
+        }
+        
         .period-btn {
             padding: 8px 16px !important;
             font-size: 0.875rem !important;
@@ -400,6 +495,28 @@
     </style>
 </head>
 <body class="no-scroll" style="background-color: #0f172a !important; color: #e2e8f0 !important;">
+    <!-- User Menu in upper right corner -->
+    <div class="user-menu">
+        <div class="dropdown">
+            <div class="user-avatar" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ request.user.first_name.0|default:request.user.username.0 }}{{ request.user.last_name.0|default:'' }}
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userMenuDropdown">
+                <li class="user-dropdown-header">
+                    <div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                    <div class="user-email">{{ request.user.email|default:'No email provided' }}</div>
+                </li>
+                <li><a class="dropdown-item" href="{% url 'change_user' %}">
+                    <i class="fas fa-user-edit"></i>Change User
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'goodbye' %}">
+                    <i class="fas fa-sign-out-alt"></i>Sign Out
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    
     <!-- Brand Title in upper left corner -->
     <div class="brand-title" style="color: #06b6d4 !important;">
         Portfolio Suite
