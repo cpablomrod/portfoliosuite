@@ -64,6 +64,25 @@
                             <p class="text-muted mt-2">Track your investments with ease</p>
                         </div>
 
+                        <!-- Django Messages Display -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show">
+                                    {% if message.tags == 'error' %}
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {% elif message.tags == 'warning' %}
+                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                    {% elif message.tags == 'success' %}
+                                        <i class="fas fa-check-circle me-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle me-2"></i>
+                                    {% endif %}
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
                         {% if form.errors %}
                             <div class="alert alert-danger">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
@@ -107,9 +126,25 @@
                                 {% endif %}
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                            </button>
+                            {% if account_locked %}
+                                <button type="button" class="btn btn-danger w-100 mb-3" disabled>
+                                    <i class="fas fa-lock me-2"></i>Account Locked
+                                </button>
+                                <div class="text-center mb-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {% if unlock_time %}
+                                            Try again after {{ unlock_time|date:"g:i A" }}
+                                        {% else %}
+                                            Please wait before trying again
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary w-100 mb-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                </button>
+                            {% endif %}
 
                             <div class="text-center mb-3">
                                 <a href="{% url 'password_reset' %}" class="text-muted small">

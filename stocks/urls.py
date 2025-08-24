@@ -2,9 +2,11 @@ from django.urls import path
 from . import views
 from . import auth_views
 from .real_data_service import real_historical_chart_data
+from .debug_login import debug_login_status
 
 urlpatterns = [
     # Authentication URLs
+    path('accounts/login/', auth_views.secure_login_view, name='login'),
     path('register/', auth_views.register_view, name='register'),
     path('profile/', auth_views.profile_view, name='profile'),
     
@@ -25,4 +27,7 @@ urlpatterns = [
     # User management URLs
     path('change-user/', auth_views.change_user_view, name='change_user'),
     path('goodbye/', auth_views.goodbye_view, name='goodbye'),
+    
+    # Debug URL
+    path('debug-login/', debug_login_status, name='debug_login'),
 ]

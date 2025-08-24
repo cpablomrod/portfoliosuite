@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'stocks.security.buffer_protection.BufferOverflowProtectionMiddleware',  # Buffer overflow protection
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -131,6 +132,11 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
+# Use custom authentication backend that tracks login attempts
+AUTHENTICATION_BACKENDS = [
+    'stocks.auth_backends.SecureModelBackend',
+]
+
 # Email configuration for password reset
 # Use real email backend for sending actual emails
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
@@ -168,3 +174,34 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Buffer Overflow Protection Settings
+MAX_REQUEST_SIZE = 10 * 1024 * 1024  # 10MB max request size
+MAX_FIELD_LENGTH = 10000  # 10KB max field length
+MAX_POST_FIELDS = 100  # Max number of POST fields
+MAX_HEADER_SIZE = 8192  # 8KB max header size
+MAX_URL_LENGTH = 2048  # 2KB max URL length
+
+# Logging configuration for security events
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'security.log',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'security': {
+            'handlers': ['security_file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
