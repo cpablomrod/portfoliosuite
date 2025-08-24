@@ -1,45 +1,47 @@
-# Stock Portfolio Tracker
+# Portfolio Suite
 
-A Django-based web application to track your stock portfolio and run historical simulations.
+A Django-based web application to track your stock portfolio and run historical simulations. **No API keys required!**
 
-## Features
+## ✨ Features
 
-- **Portfolio Management**: Track your stock purchases and sales
-- **Current Positions**: View your current stock holdings with gains/losses
-- **Price Updates**: Fetch real-time stock prices from Alpha Vantage API  
-- **Historical Simulations**: Run "what-if" scenarios for past time periods
-- **Single-Screen Dashboard**: All functionality on one compact screen
-- **Responsive Design**: Works on laptop screens without scrolling
+- **Portfolio Management**: Track your stock purchases and sales across multiple portfolios
+- **Current Positions**: View your current stock holdings with real-time gains/losses
+- **Free Stock Data**: Fetches stock prices from Yahoo Finance and multiple free APIs
+- **Historical Simulations**: Run "what-if" scenarios for past investment periods
+- **Interactive Charts**: Portfolio performance and individual stock charts
+- **PDF Reports**: Generate detailed portfolio reports
+- **Multiple Portfolios**: Switch between different investment portfolios
+- **Responsive Design**: Works perfectly on desktop and mobile devices
 
-## Setup Instructions
+## 🚀 Quick Start
 
-### 1. Alpha Vantage API Key
+### 1. Clone the Repository
 
-You'll need a free API key from Alpha Vantage to fetch stock data:
-
-1. Go to [https://www.alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key)
-2. Sign up for a free account
-3. Get your API key (free tier allows 25 requests per day, 5 requests per minute)
-
-### 2. Environment Configuration
-
-Edit the `.env` file in the project root and add your API key:
-
+```bash
+git clone https://github.com/cpablomrod/portfoliosuite.git
+cd portfoliosuite
 ```
-ALPHA_VANTAGE_API_KEY=your_actual_api_key_here
-DEBUG=True
-SECRET_KEY=your-secret-key-here
+
+### 2. Set Up Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
 
-The virtual environment and dependencies are already set up. To activate the environment:
-
 ```bash
-source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-### 4. Run the Application
+### 4. Set Up Database
+
+```bash
+python manage.py migrate
+```
+
+### 5. Run the Application
 
 ```bash
 python manage.py runserver
@@ -89,69 +91,104 @@ Open your browser and go to `http://localhost:8000`
 - Historical simulation form
 - Simulation results with individual stock performance
 
-## Database Models
+## 🔄 Data Sources
+
+Portfolio Suite uses multiple **free** data sources with automatic fallbacks:
+
+1. **Yahoo Finance** (Primary) - Real-time and historical data
+2. **Twelve Data** (Demo) - Backup financial data API
+3. **Alpha Vantage** (Demo mode) - No API key required
+4. **Financial Modeling Prep** (Demo) - Free tier access
+5. **MarketStack** (Demo) - Additional data source
+
+**No API keys needed!** The app works out of the box.
+
+## 🗄️ Database Models
 
 - **Stock**: Basic stock information (symbol, company name)
 - **StockPrice**: Historical daily prices (OHLCV data)
 - **Portfolio**: Your transactions (buys/sells with dates and prices)
 
-## API Rate Limits
-
-- Alpha Vantage free tier: 25 requests/day, 5 requests/minute
-- The app automatically handles rate limiting
-- Price updates fetch the most recent data available
-
-## File Structure
+## 📁 File Structure
 
 ```
-stock_portfolio_tracker/
-├── stocks/                 # Main Django app
-│   ├── models.py          # Database models
-│   ├── views.py           # View logic
-│   ├── forms.py           # Django forms
-│   ├── services.py        # API and analytics services
-│   ├── templates/         # HTML templates
-│   └── admin.py           # Django admin config
-├── portfolio_tracker/     # Django project settings
-├── db.sqlite3            # SQLite database
-├── .env                  # Environment variables
-└── manage.py             # Django management script
+portfoliosuite/
+├── stocks/                    # Main Django app
+│   ├── models.py             # Database models
+│   ├── views.py              # View logic and API endpoints
+│   ├── forms.py              # Django forms
+│   ├── services.py           # Stock data and analytics services
+│   ├── free_data_service.py  # Free API integrations
+│   ├── yahoo_finance.py      # Yahoo Finance integration
+│   ├── templates/stocks/     # HTML templates
+│   ├── management/commands/  # Django management commands
+│   └── migrations/           # Database migrations
+├── portfolio_tracker/        # Django project settings
+├── requirements.txt          # Python dependencies
+├── db.sqlite3               # SQLite database (excluded from git)
+├── .env                     # Environment variables (excluded from git)
+└── manage.py                # Django management script
 ```
 
-## Admin Interface
+## 🔧 Admin Interface
 
 Access the Django admin at `http://localhost:8000/admin/` to:
 - View and edit transactions directly
-- Manage stock data
-- View price history
+- Manage stock data and price history
+- Monitor system performance
 
 Create a superuser account:
 ```bash
 python manage.py createsuperuser
 ```
 
-## Troubleshooting
-
-**API Key Issues:**
-- Make sure your API key is correctly set in the `.env` file
-- Check that you haven't exceeded the rate limit (25 requests/day)
+## 🐛 Troubleshooting
 
 **No Price Data:**
 - Stock prices are only available for trading days
-- Some symbols might not be available in Alpha Vantage
-- Try updating prices for individual stocks
+- The app tries multiple data sources automatically
+- Check internet connection for API access
 
 **Simulation Errors:**
-- Ensure you have price data for the simulation period
-- Check that stock symbols are valid
-- Make sure dates are not weekends or holidays
+- Ensure simulation period covers trading days
+- Verify stock symbols are valid (e.g., AAPL, MSFT, GOOGL)
+- Check that start date is before end date
 
-## Extending the App
+**Performance Issues:**
+- Large portfolios may take longer to update prices
+- The app caches prices to improve performance
+- Consider running price updates during off-hours
 
-You can easily extend this app by:
-- Adding more stock data providers
-- Implementing portfolio charts and visualizations  
-- Adding alerts for price targets
-- Creating more sophisticated analytics
-- Integrating with brokerage APIs
-- Adding user authentication for multiple portfolios
+## 🚀 Key Technologies
+
+- **Backend**: Django 5.2.5, Python 3.8+
+- **Database**: SQLite (easily upgradable to PostgreSQL)
+- **Data Sources**: Yahoo Finance API, Multiple free financial APIs
+- **Charts**: Chart.js for interactive visualizations
+- **Reports**: ReportLab for PDF generation
+- **Frontend**: Bootstrap 5, responsive design
+
+## 🎯 Extending the App
+
+Easy customization options:
+- **Add more data sources**: Implement new API integrations in `free_data_service.py`
+- **Custom analytics**: Extend `services.py` with new portfolio metrics
+- **Advanced charts**: Add new chart types in the dashboard templates
+- **User authentication**: Add Django's built-in user system for multi-user support
+- **Real-time updates**: Implement WebSocket connections for live price feeds
+- **Mobile app**: Create API endpoints for mobile app integration
+- **Cloud deployment**: Deploy to Heroku, AWS, or other cloud platforms
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
