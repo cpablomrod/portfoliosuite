@@ -11,6 +11,4 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
-      - key: PYTHON_VERSION
-        value: 3.11.0
     plan: free

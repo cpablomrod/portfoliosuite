@@ -41,12 +41,30 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 # Email configuration (for password reset)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+# Use console backend if no email credentials provided (development/testing)
+if os.environ.get('EMAIL_HOST_USER') and os.environ.get('EMAIL_HOST_PASSWORD'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    
+    # Support multiple email providers
+    email_provider = os.environ.get('EMAIL_PROVIDER', 'brevo').lower()
+    
+    if email_provider == 'brevo':
+        EMAIL_HOST = 'smtp-relay.brevo.com'
+    elif email_provider == 'gmail':
+        EMAIL_HOST = 'smtp.gmail.com'
+    elif email_provider == 'outlook':
+        EMAIL_HOST = 'smtp-mail.outlook.com'
+    else:
+        EMAIL_HOST = 'smtp-relay.brevo.com'  # Default to Brevo
+    
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+else:
+    # Fallback to console backend (emails will appear in logs)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@portfoliosuite.com')
 
 # Alpha Vantage API Key (for stock data)
