@@ -4,7 +4,6 @@ from . import auth_views
 from .real_data_service import real_historical_chart_data
 from .debug_login import debug_login_status
 from .debug_views import debug_lockout_view
-from .admin_setup import create_admin_user
 from django.contrib.auth import views as django_auth_views
 
 urlpatterns = [
@@ -39,7 +38,4 @@ urlpatterns = [
     # Debug URLs
     path('debug-login/', debug_login_status, name='debug_login'),
     path('debug-lockout/', debug_lockout_view, name='debug_lockout'),
-    
-    # Admin Setup URL (TEMPORARY - REMOVE AFTER USE)
-    path('setup-admin/', create_admin_user, name='setup_admin'),
 ]
