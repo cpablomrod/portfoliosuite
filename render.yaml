@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: portfoliosuite
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn portfolio_tracker.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: portfolio_tracker.settings_render_free
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    plan: free

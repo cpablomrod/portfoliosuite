@@ -1,0 +1,10 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/accounts/login/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[environments.production]
+DJANGO_SETTINGS_MODULE = "portfolio_tracker.settings_production"
