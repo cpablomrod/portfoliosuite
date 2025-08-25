@@ -153,19 +153,19 @@ def secure_login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     
-    # Initialize form
+    # Initialize variables
     form = AuthenticationForm()
     account_locked = False
     
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         
-        # Check if account is locked before processing form
+        # Check if account is locked FIRST - before any form processing
         if username:
             is_locked, unlock_time = LoginAttempt.is_account_locked(username)
             
             if is_locked and unlock_time:
-                account_locked = True
+                # Account is locked - show lockout message and prevent login
                 time_remaining = unlock_time - timezone.now()
                 minutes_remaining = max(1, int(time_remaining.total_seconds() / 60))
                 messages.error(
@@ -174,7 +174,7 @@ def secure_login_view(request):
                     f'Please try again in {minutes_remaining} minute{"s" if minutes_remaining != 1 else ""}.'
                 )
                 
-                # Still record this as a failed attempt
+                # Record this attempt as a failed login to locked account
                 from .auth_backends import get_client_ip, get_user_agent
                 LoginAttempt.objects.create(
                     username=username,
@@ -183,15 +183,16 @@ def secure_login_view(request):
                     success=False
                 )
                 
+                # Return immediately with locked account status
                 return render(request, 'registration/login.html', {
-                    'form': AuthenticationForm(),
+                    'form': AuthenticationForm(),  # Fresh empty form
                     'account_locked': True,
                     'unlock_time': unlock_time,
-                    'failed_attempts': 3,
+                    'failed_attempts': LoginAttempt.get_failed_attempts_count(username),
                     'locked_username': username
                 })
         
-        # If not locked, process the form normally
+        # Account is not locked - proceed with normal login flow
         form = AuthenticationForm(request, data=request.POST)
         
         # Show warning for approaching lockout (before form validation)
@@ -228,7 +229,7 @@ def secure_login_view(request):
             messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
             return redirect('dashboard')
         else:
-            # Form is invalid (wrong password)
+            # Form validation failed (wrong credentials)
             if username:
                 # Record failed attempt
                 from .auth_backends import get_client_ip, get_user_agent
@@ -239,15 +240,29 @@ def secure_login_view(request):
                     success=False
                 )
                 
-                # Check if this was the 3rd failed attempt
+                # Check if this failed attempt triggers lockout
                 failed_attempts = LoginAttempt.get_failed_attempts_count(username)
                 if failed_attempts >= 3:
+                    # Account just got locked with this attempt
                     messages.error(
                         request, 
                         f'🔒 Account "{username}" has been locked for 15 minutes due to too many failed login attempts.'
                     )
                     account_locked = True
+                    
+                    # Calculate unlock time for the newly locked account
+                    from datetime import timedelta
+                    unlock_time = timezone.now() + timedelta(minutes=15)
+                    
+                    return render(request, 'registration/login.html', {
+                        'form': AuthenticationForm(),  # Fresh empty form
+                        'account_locked': True,
+                        'unlock_time': unlock_time,
+                        'failed_attempts': failed_attempts,
+                        'locked_username': username
+                    })
                 else:
+                    # Show remaining attempts warning
                     remaining = 3 - failed_attempts
                     messages.error(
                         request, 

@@ -3,10 +3,17 @@ from . import views
 from . import auth_views
 from .real_data_service import real_historical_chart_data
 from .debug_login import debug_login_status
+from .debug_views import debug_lockout_view
+from django.contrib.auth import views as django_auth_views
 
 urlpatterns = [
-    # Authentication URLs
+    # Authentication URLs (custom secure login)
     path('accounts/login/', auth_views.secure_login_view, name='login'),
+    path('accounts/logout/', django_auth_views.LogoutView.as_view(), name='logout'),
+    path('accounts/password_reset/', django_auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('accounts/password_reset/done/', django_auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', django_auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('accounts/reset/done/', django_auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('register/', auth_views.register_view, name='register'),
     path('profile/', auth_views.profile_view, name='profile'),
     
@@ -28,6 +35,7 @@ urlpatterns = [
     path('change-user/', auth_views.change_user_view, name='change_user'),
     path('goodbye/', auth_views.goodbye_view, name='goodbye'),
     
-    # Debug URL
+    # Debug URLs
     path('debug-login/', debug_login_status, name='debug_login'),
+    path('debug-lockout/', debug_lockout_view, name='debug_lockout'),
 ]

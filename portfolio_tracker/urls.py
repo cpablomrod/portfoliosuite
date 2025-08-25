@@ -19,6 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),  # Built-in auth URLs
+    # Remove built-in auth URLs to avoid conflicts with custom secure login
+    # path('accounts/', include('django.contrib.auth.urls')),  # Commented out
     path('', include('stocks.urls')),
 ]

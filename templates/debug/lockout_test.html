@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Lockout Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>🔍 Debug: Account Lockout Test</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Django Messages Test</h3>
+                
+                <!-- Django Messages Display (same as login template) -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning">No messages found!</div>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Account Lockout Status</h3>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <p><strong>Current Time:</strong> {{ current_time }}</p>
+                        
+                        {% for username, info in lockout_info.items %}
+                            <div class="mb-3 p-3 {% if info.is_locked %}bg-danger{% else %}bg-success{% endif %} text-white rounded">
+                                <h5>{{ username }}</h5>
+                                <ul class="mb-0">
+                                    <li>Locked: {{ info.is_locked|yesno:"Yes,No" }}</li>
+                                    <li>Failed Attempts: {{ info.failed_attempts }}</li>
+                                    {% if info.unlock_time %}
+                                        <li>Unlock Time: {{ info.unlock_time }}</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Go to Login Page</a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
