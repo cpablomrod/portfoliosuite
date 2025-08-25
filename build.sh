@@ -11,12 +11,5 @@ python manage.py collectstatic --noinput
 # Run database migrations
 python manage.py migrate
 
-# Create superuser if needed (optional - you can do this manually later)
-# python manage.py shell -c "
-# from django.contrib.auth.models import User
-# if not User.objects.filter(username='admin').exists():
-#     User.objects.create_superuser('admin', 'admin@portfoliosuite.com', 'your-secure-password')
-#     print('Superuser created')
-# else:
-#     print('Superuser already exists')
-# "
+# Create superuser if needed
+python manage.py create_production_superuser --username=admin --email=admin@portfoliosuite.com
