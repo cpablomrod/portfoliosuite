@@ -11,7 +11,6 @@ python manage.py collectstatic --noinput
 # Run database migrations
 python manage.py migrate
 
-# Create superuser if needed (run twice to ensure it works)
+# Create superuser if needed
 echo "Creating/updating admin superuser..."
-python manage.py create_production_superuser --username=admin --email=admin@portfoliosuite.com || echo "First attempt failed, trying again..."
-python manage.py create_production_superuser --username=admin --email=admin@portfoliosuite.com || echo "Admin creation completed"
+python create_admin.py || echo "Admin creation completed with fallback"
