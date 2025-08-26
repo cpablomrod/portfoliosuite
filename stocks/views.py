@@ -151,23 +151,13 @@ def dashboard(request):
 def add_transaction(request):
     """Add a new transaction"""
     try:
-        # Debug: Log the incoming data
-        print(f"DEBUG: Transaction data received: {request.POST}")
-        print(f"DEBUG: User: {request.user}")
-        print(f"DEBUG: Session portfolio: {request.session.get('current_portfolio')}")
-        
         form = AddTransactionForm(request.POST)
         if form.is_valid():
             # Get current portfolio name from session
             current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
-            print(f"DEBUG: Portfolio name: {current_portfolio}")
-            print(f"DEBUG: Form cleaned data: {form.cleaned_data}")
-            
             transaction = form.save(portfolio_name=current_portfolio, user=request.user)
-            print(f"DEBUG: Transaction created successfully: {transaction}")
             messages.success(request, f'Transaction added: {transaction.transaction_type} {transaction.quantity} {transaction.stock.symbol}')
         else:
-            print(f"DEBUG: Form validation failed: {form.errors}")
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f'{field}: {error}')
@@ -175,9 +165,11 @@ def add_transaction(request):
         # Catch any unexpected errors
         import traceback
         error_msg = str(e)
-        traceback_msg = traceback.format_exc()
-        print(f"ERROR in add_transaction: {error_msg}")
-        print(f"TRACEBACK: {traceback_msg}")
+        # Only log to console in development
+        import os
+        if os.environ.get('DJANGO_SETTINGS_MODULE', '').endswith('settings'):
+            print(f"ERROR in add_transaction: {error_msg}")
+            print(f"TRACEBACK: {traceback.format_exc()}")
         messages.error(request, f'Error adding transaction: {error_msg}')
     
     return redirect('dashboard')
