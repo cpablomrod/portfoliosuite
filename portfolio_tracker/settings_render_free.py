@@ -1,5 +1,5 @@
 """
-Render Free Tier settings for Portfolio Suite (uses SQLite)
+Render Free Tier settings for Portfolio Suite (uses PostgreSQL for data persistence)
 """
 import os
 from .settings import *
@@ -11,13 +11,23 @@ ALLOWED_HOSTS = [
     'portfoliosuite.onrender.com',  # Your specific domain
 ]
 
-# Use SQLite for free tier (simpler, no database cost)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+# Use PostgreSQL for production (persists data between deployments)
+# Render provides a free PostgreSQL database
+import dj_database_url
+
+if 'DATABASE_URL' in os.environ:
+    # Use PostgreSQL from Render
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-}
+else:
+    # Fallback to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Add whitenoise to middleware if not already there
 if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
