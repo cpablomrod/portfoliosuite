@@ -111,10 +111,24 @@ def db_info_view(request):
             'USER': connection.settings_dict.get('USER', 'Unknown'),
         }
         
-        # Test connection
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT version()")
-            db_version = cursor.fetchone()[0] if cursor.fetchone else "Unknown"
+        # Test connection and get database version
+        db_version = "Unknown"
+        try:
+            with connection.cursor() as cursor:
+                # Try PostgreSQL version command
+                if 'postgresql' in db_settings['ENGINE'].lower():
+                    cursor.execute("SELECT version()")
+                    result = cursor.fetchone()
+                    db_version = result[0] if result else "PostgreSQL (version unknown)"
+                # Try SQLite version command
+                elif 'sqlite' in db_settings['ENGINE'].lower():
+                    cursor.execute("SELECT sqlite_version()")
+                    result = cursor.fetchone()
+                    db_version = f"SQLite {result[0]}" if result else "SQLite (version unknown)"
+                else:
+                    db_version = "Unknown database type"
+        except Exception as version_error:
+            db_version = f"Version check failed: {version_error}"
         
         # Count users
         user_count = User.objects.count()
@@ -133,7 +147,7 @@ def db_info_view(request):
     <li>Port: {db_settings['PORT']}</li>
     <li>Database: {db_settings['NAME']}</li>
     <li>User: {db_settings['USER']}</li>
-    <li>Version: PostgreSQL detected</li>
+    <li>Version: {db_version}</li>
 </ul>
 
 <h3>User Data:</h3>
