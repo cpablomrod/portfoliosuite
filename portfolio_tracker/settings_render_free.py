@@ -15,6 +15,14 @@ ALLOWED_HOSTS = [
 # Render provides a free PostgreSQL database
 import dj_database_url
 
+# Test PostgreSQL driver availability
+try:
+    import psycopg2
+    print("✅ psycopg2 driver available")
+except ImportError as e:
+    print(f"❌ psycopg2 driver not available: {e}")
+    print("📦 This may cause PostgreSQL connection issues")
+
 # Debug: Print database URL info
 print(f"🔍 DATABASE_URL present: {'DATABASE_URL' in os.environ}")
 if 'DATABASE_URL' in os.environ:
