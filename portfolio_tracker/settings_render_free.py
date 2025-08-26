@@ -33,23 +33,52 @@ if 'DATABASE_URL' in os.environ:
         }
     except Exception as e:
         print(f"❌ Failed to parse DATABASE_URL: {e}")
-        print("🔄 Falling back to SQLite")
-        # Fallback to SQLite if parsing fails
+        print("🔄 Falling back to manual PostgreSQL config")
+        # Try manual PostgreSQL config as backup
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.environ.get('DATABASE_NAME', 'portfoliosuite'),
+                'USER': os.environ.get('DATABASE_USER', 'portfoliosuite'),
+                'PASSWORD': os.environ.get('DATABASE_PASSWORD', ''),
+                'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+                'PORT': os.environ.get('DATABASE_PORT', '5432'),
+            }
+        }
+else:
+    print("⚠️ No DATABASE_URL found - trying manual PostgreSQL configuration")
+    
+    # Check if we have individual PostgreSQL environment variables
+    pg_vars = {
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'), 
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': os.environ.get('DATABASE_PORT', '5432'),
+    }
+    
+    if pg_vars['HOST'] and pg_vars['USER'] and pg_vars['PASSWORD']:
+        print("✅ Found individual PostgreSQL environment variables")
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': pg_vars['NAME'] or 'portfoliosuite',
+                'USER': pg_vars['USER'],
+                'PASSWORD': pg_vars['PASSWORD'],
+                'HOST': pg_vars['HOST'],
+                'PORT': pg_vars['PORT'],
+            }
+        }
+    else:
+        print("❌ No PostgreSQL configuration found at all")
+        print("🔄 Using SQLite fallback for now")
+        # Fallback to SQLite only if absolutely no PostgreSQL config available
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
                 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
             }
         }
-else:
-    print("🔄 Using SQLite fallback (no DATABASE_URL)")
-    # Fallback to SQLite for local development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
 
 # Add whitenoise to middleware if not already there
 if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:

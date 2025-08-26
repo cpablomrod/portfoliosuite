@@ -204,6 +204,11 @@ def env_debug_view(request):
     env_vars = {
         'DJANGO_SETTINGS_MODULE': os.environ.get('DJANGO_SETTINGS_MODULE', 'Not Set'),
         'DATABASE_URL': 'Present' if 'DATABASE_URL' in os.environ else 'Not Found',
+        'DATABASE_NAME': os.environ.get('DATABASE_NAME', 'Not Set'),
+        'DATABASE_USER': os.environ.get('DATABASE_USER', 'Not Set'),
+        'DATABASE_PASSWORD': 'Present' if 'DATABASE_PASSWORD' in os.environ else 'Not Found',
+        'DATABASE_HOST': os.environ.get('DATABASE_HOST', 'Not Set'),
+        'DATABASE_PORT': os.environ.get('DATABASE_PORT', 'Not Set'),
         'SECRET_KEY': 'Present' if 'SECRET_KEY' in os.environ else 'Not Found',
     }
     
