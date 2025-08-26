@@ -71,14 +71,20 @@ else:
         }
     else:
         print("❌ No PostgreSQL configuration found at all")
-        print("🔄 Using SQLite fallback for now")
-        # Fallback to SQLite only if absolutely no PostgreSQL config available
+        print("⚠️ IMPORTANT: PostgreSQL database service is missing!")
+        print("🔄 Using SQLite temporarily - data will not persist between deployments")
+        print("📝 Action required: Create PostgreSQL database service in Render dashboard")
+        
+        # Temporary SQLite fallback with warning
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
                 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
             }
         }
+        
+        # Set a flag to show database warning in admin
+        SHOW_DATABASE_WARNING = True
 
 # Add whitenoise to middleware if not already there
 if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
