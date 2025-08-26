@@ -16,12 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from stocks.admin_setup_view import setup_admin_view, db_info_view
+from stocks.admin_setup_view import setup_admin_view, db_info_view, env_debug_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('setup-admin/', setup_admin_view, name='setup_admin'),
     path('db-info/', db_info_view, name='db_info'),
+    path('env-debug/', env_debug_view, name='env_debug'),
     # Remove built-in auth URLs to avoid conflicts with custom secure login
     # path('accounts/', include('django.contrib.auth.urls')),  # Commented out
     path('', include('stocks.urls')),

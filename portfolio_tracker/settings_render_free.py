@@ -15,12 +15,34 @@ ALLOWED_HOSTS = [
 # Render provides a free PostgreSQL database
 import dj_database_url
 
+# Debug: Print database URL info
+print(f"🔍 DATABASE_URL present: {'DATABASE_URL' in os.environ}")
 if 'DATABASE_URL' in os.environ:
-    # Use PostgreSQL from Render
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-    }
+    db_url = os.environ.get('DATABASE_URL')
+    print(f"🔍 DATABASE_URL starts with: {db_url[:50]}..." if len(db_url) > 50 else f"🔍 DATABASE_URL: {db_url}")
 else:
+    print("❌ No DATABASE_URL found in environment")
+
+if 'DATABASE_URL' in os.environ:
+    try:
+        # Use PostgreSQL from Render
+        parsed_db = dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        print(f"✅ PostgreSQL database parsed successfully: {parsed_db['ENGINE']}")
+        DATABASES = {
+            'default': parsed_db
+        }
+    except Exception as e:
+        print(f"❌ Failed to parse DATABASE_URL: {e}")
+        print("🔄 Falling back to SQLite")
+        # Fallback to SQLite if parsing fails
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            }
+        }
+else:
+    print("🔄 Using SQLite fallback (no DATABASE_URL)")
     # Fallback to SQLite for local development
     DATABASES = {
         'default': {

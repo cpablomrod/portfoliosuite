@@ -190,3 +190,73 @@ def db_info_view(request):
 </html>
         """
         return HttpResponse(error_html, status=500)
+
+
+def env_debug_view(request):
+    """
+    Show environment variables for debugging
+    Access at: /env-debug/
+    """
+    import os
+    from django.conf import settings
+    
+    # Get key environment variables (without exposing secrets)
+    env_vars = {
+        'DJANGO_SETTINGS_MODULE': os.environ.get('DJANGO_SETTINGS_MODULE', 'Not Set'),
+        'DATABASE_URL': 'Present' if 'DATABASE_URL' in os.environ else 'Not Found',
+        'SECRET_KEY': 'Present' if 'SECRET_KEY' in os.environ else 'Not Found',
+    }
+    
+    # Check if DATABASE_URL starts with expected prefix
+    if 'DATABASE_URL' in os.environ:
+        db_url = os.environ.get('DATABASE_URL')
+        if db_url.startswith('postgres://'):
+            env_vars['DATABASE_URL_TYPE'] = 'PostgreSQL'
+        elif db_url.startswith('sqlite://'):
+            env_vars['DATABASE_URL_TYPE'] = 'SQLite'
+        else:
+            env_vars['DATABASE_URL_TYPE'] = 'Unknown'
+        env_vars['DATABASE_URL_PREFIX'] = db_url[:30] + '...' if len(db_url) > 30 else db_url
+    
+    # Get Django database configuration
+    db_config = settings.DATABASES['default']
+    
+    response_html = f"""
+<html>
+<head><title>Environment Debug</title></head>
+<body style="font-family: monospace; padding: 20px;">
+<h2>🐛 Environment Debug Information</h2>
+
+<h3>Environment Variables:</h3>
+<table border="1" cellpadding="5">
+    <tr><th>Variable</th><th>Status</th></tr>
+"""
+    
+    for key, value in env_vars.items():
+        response_html += f"<tr><td>{key}</td><td>{value}</td></tr>"
+    
+    response_html += f"""
+</table>
+
+<h3>Django Database Configuration:</h3>
+<table border="1" cellpadding="5">
+    <tr><th>Setting</th><th>Value</th></tr>
+    <tr><td>ENGINE</td><td>{db_config.get('ENGINE', 'Unknown')}</td></tr>
+    <tr><td>NAME</td><td>{db_config.get('NAME', 'Unknown')}</td></tr>
+    <tr><td>HOST</td><td>{db_config.get('HOST', 'Unknown')}</td></tr>
+    <tr><td>PORT</td><td>{db_config.get('PORT', 'Unknown')}</td></tr>
+    <tr><td>USER</td><td>{db_config.get('USER', 'Unknown')}</td></tr>
+</table>
+
+<h3>🔗 Other Debug URLs:</h3>
+<ul>
+    <li><a href="/setup-admin/">Setup Admin User</a></li>
+    <li><a href="/db-info/">Database Information</a></li>
+    <li><a href="/admin/">Admin Console</a></li>
+</ul>
+
+</body>
+</html>
+    """
+    
+    return HttpResponse(response_html)
