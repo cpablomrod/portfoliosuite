@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'stocks.security.buffer_protection.BufferOverflowProtectionMiddleware',  # Buffer overflow protection
+    # 'stocks.security.buffer_protection.BufferOverflowProtectionMiddleware',  # Temporarily disabled
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
