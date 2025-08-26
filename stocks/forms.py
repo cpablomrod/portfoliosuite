@@ -100,36 +100,53 @@ class AddTransactionForm(forms.ModelForm):
         return price
     
     def save(self, portfolio_name='My Investment Portfolio', user=None, commit=True):
-        instance = super().save(commit=False)
-        
-        # Get or create the stock based on the symbol
-        symbol = self.cleaned_data['symbol']
-        stock, created = Stock.objects.get_or_create(
-            symbol=symbol,
-            defaults={'company_name': ''}
-        )
-        instance.stock = stock
-        
-        # Set the user (required)
-        if user:
-            instance.user = user
-        
-        # Set the portfolio name
-        instance.portfolio_name = portfolio_name
-        
-        # Use provided price or default to 0.00
-        price = self.cleaned_data.get('price_per_share')
-        if price is not None and price > 0:
-            instance.price_per_share = price
-        else:
-            instance.price_per_share = 0.00  # Default price - will be updated when prices are fetched
+        try:
+            print(f"DEBUG: Starting form save with portfolio_name={portfolio_name}, user={user}")
+            instance = super().save(commit=False)
             
-        instance.transaction_date = timezone.now().date()  # Default to today
-        
-        if commit:
-            instance.save()
-        
-        return instance
+            # Get or create the stock based on the symbol
+            symbol = self.cleaned_data['symbol']
+            print(f"DEBUG: Creating/getting stock for symbol: {symbol}")
+            stock, created = Stock.objects.get_or_create(
+                symbol=symbol,
+                defaults={'company_name': ''}
+            )
+            instance.stock = stock
+            print(f"DEBUG: Stock {'created' if created else 'found'}: {stock}")
+            
+            # Set the user (required)
+            if user:
+                instance.user = user
+                print(f"DEBUG: Set user: {user}")
+            else:
+                raise ValueError("User is required for transaction")
+            
+            # Set the portfolio name
+            instance.portfolio_name = portfolio_name
+            print(f"DEBUG: Set portfolio name: {portfolio_name}")
+            
+            # Use provided price or default to 0.00
+            price = self.cleaned_data.get('price_per_share')
+            if price is not None and price > 0:
+                instance.price_per_share = price
+            else:
+                instance.price_per_share = 0.00  # Default price - will be updated when prices are fetched
+            print(f"DEBUG: Set price: {instance.price_per_share}")
+                
+            instance.transaction_date = timezone.now().date()  # Default to today
+            print(f"DEBUG: Set transaction date: {instance.transaction_date}")
+            
+            if commit:
+                print(f"DEBUG: Saving instance to database...")
+                instance.save()
+                print(f"DEBUG: Instance saved successfully: {instance}")
+            
+            return instance
+        except Exception as e:
+            print(f"ERROR in form save: {e}")
+            import traceback
+            print(f"TRACEBACK: {traceback.format_exc()}")
+            raise
 
 
 class SimulationForm(forms.Form):
