@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -596,7 +597,7 @@
                         <div class="row text-center">
                             <div class="col-6">
                                 <h6 style="color: #94a3b8 !important;">Total Invested</h6>
-                                <h4 style="color: #60a5fa !important; font-weight: 700;">${{ summary.net_invested|floatformat:2 }}</h4>
+                                <h4 style="color: #60a5fa !important; font-weight: 700;">${{ summary.net_invested|floatformat:2|intcomma }}</h4>
                             </div>
                             <div class="col-6">
                                 <h6 style="color: #94a3b8 !important;">Companies</h6>
@@ -631,11 +632,11 @@
                                         title="Click to auto-fill form with {{ position.symbol }}">
                                         <td><strong style="color: #60a5fa !important; font-size: 14px;">{{ position.symbol }}</strong></td>
                                         <td style="color: #e2e8f0 !important; font-weight: 500;">{{ position.quantity|floatformat:0 }}</td>
-                                        <td style="color: #94a3b8 !important; font-weight: 500;">${{ position.avg_cost|floatformat:2 }}</td>
+                                        <td style="color: #94a3b8 !important; font-weight: 500;">${{ position.avg_cost|floatformat:2|intcomma }}</td>
                                         <td>
                                             {% if position.current_price %}
                                                 <div class="d-flex flex-column">
-                                                    <strong class="text-success">${{ position.current_price|floatformat:2 }}</strong>
+                                                    <strong class="text-success">${{ position.current_price|floatformat:2|intcomma }}</strong>
                                                     {% if position.gain_loss_pct %}
                                                         <small class="{% if position.gain_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
                                                             {% if position.gain_loss_pct >= 0 %}+{% endif %}{{ position.gain_loss_pct|floatformat:2 }}%
@@ -776,10 +777,10 @@
                                             </td>
                                             <td style="font-size: 14px; padding: 12px 16px; color: #94a3b8;">{{ holding.purchase_date|date:"M d, Y" }}</td>
                                             <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #94a3b8;">{{ holding.weight_pct|floatformat:1 }}%</td>
-                                            <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2 }}</td>
+                                            <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2|intcomma }}</td>
                                         <td style="font-size: 14px; padding: 12px 16px;">
                                             {% if holding.current_value %}
-                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2 }}</span>
+                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2|intcomma }}</span>
                                             {% endif %}
                                         </td>
                                             <td style="font-size: 14px; padding: 12px 16px;">
@@ -858,10 +859,10 @@
                                         </td>
                                         <td style="font-size: 14px; padding: 12px 16px; color: #94a3b8;">{{ holding.purchase_date|date:"M d, Y" }}</td>
                                         <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #94a3b8;">{{ holding.weight_pct|floatformat:1 }}%</td>
-                                        <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2 }}</td>
+                                        <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2|intcomma }}</td>
                                         <td style="font-size: 14px; padding: 12px 16px;">
                                             {% if holding.current_value %}
-                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2 }}</span>
+                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2|intcomma }}</span>
                                             {% endif %}
                                         </td>
                                         <td style="font-size: 14px; padding: 12px 16px;">
@@ -929,7 +930,7 @@
                                         <br><small class="text-muted" style="font-size: 11px;">{{ dividend.yield_pct|floatformat:1 }}% yield</small>
                                     </div>
                                     <div class="text-end">
-                                        <div style="font-size: 12px; color: #28a745; font-weight: 600;">${{ dividend.expected_amount|floatformat:2 }}</div>
+                                        <div style="font-size: 12px; color: #28a745; font-weight: 600;">${{ dividend.expected_amount|floatformat:2|intcomma }}</div>
                                         <small class="text-muted" style="font-size: 11px;">{{ dividend.ex_date|default:"TBD" }}</small>
                                     </div>
                                 </div>
