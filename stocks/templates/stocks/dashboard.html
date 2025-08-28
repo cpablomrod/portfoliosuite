@@ -1067,7 +1067,7 @@
                 </div>
                 <div class="modal-body support-modal-body">
                     <div id="supportFormContainer">
-                        <form id="supportForm">
+                        <form id="supportForm" data-support-url="{% url 'create_support_message' %}">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="supportSubject" class="form-label">Subject <span class="text-danger">*</span></label>
@@ -2820,7 +2820,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
             submitBtn.disabled = true;
             
-            fetch('{% url "create_support_message" %}', {
+            fetch(form.dataset.supportUrl, {
                 method: 'POST',
                 body: formData,
                 headers: {
