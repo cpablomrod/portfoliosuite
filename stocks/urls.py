@@ -38,4 +38,9 @@ urlpatterns = [
     # Debug URLs
     path('debug-login/', debug_login_status, name='debug_login'),
     path('debug-lockout/', debug_lockout_view, name='debug_lockout'),
+    
+    # Support URLs
+    path('support/create/', views.create_support_message, name='create_support_message'),
+    path('support/messages/', views.get_user_support_messages, name='get_user_support_messages'),
+    path('support/history/', views.support_history, name='support_history'),
 ]

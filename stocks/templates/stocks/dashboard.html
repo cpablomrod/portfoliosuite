@@ -5,60 +5,2820 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Suite - Test</title>
+    <title>Swan Portfolio Suite</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Cache busting timestamp -->
+    <meta name="cache-version" content="20250122170937">
+    <style>
+        /* MODERN BLUE FINANCE UI - LOADED AFTER BOOTSTRAP */
+        
+        /* Force new styles with higher priority */
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1e40af;
+            --light-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --dark-blue: #1e293b;
+            --darker-blue: #0f172a;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Override Bootstrap with more specific selectors */
+        body .container-fluid {
+            background-color: var(--bg-primary) !important;
+        }
+        
+        body .card {
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        body .card-header {
+            background-color: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        body .card-body {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        body .card-metric {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        body .btn-primary {
+            background-color: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+        }
+        
+        body .btn-primary:hover, body .btn-primary:focus, body .btn-primary:active {
+            background-color: var(--secondary-blue) !important;
+            border-color: var(--secondary-blue) !important;
+        }
+        
+        body .btn-success {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+        }
+        
+        body .text-primary {
+            color: var(--primary-blue) !important;
+        }
+        
+        body .text-success {
+            color: var(--success-color) !important;
+        }
+        
+        body .text-danger {
+            color: var(--danger-color) !important;
+        }
+        
+        /* Time period buttons with higher specificity */
+        body .period-btn {
+            padding: 8px 16px !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            border-radius: 8px !important;
+            border: 1.5px solid var(--border-color) !important;
+            background-color: white !important;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s ease !important;
+            margin: 0 3px !important;
+            cursor: pointer !important;
+        }
+        
+        body .period-btn:hover:not(.active-period) {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--accent-blue) !important;
+            color: var(--primary-blue) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 4px rgb(59 130 246 / 0.15) !important;
+        }
+        
+        body .period-btn.active-period {
+            background-color: #06b6d4 !important;  /* Cyan */
+            border-color: #06b6d4 !important;
+            color: white !important;
+            box-shadow: 0 3px 6px rgb(6 182 212 / 0.3) !important;
+        }
+        
+        .card {
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+            background-color: white !important;
+        }
+        
+        .card-metric {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .gain-positive { color: var(--success-color) !important; }
+        .gain-negative { color: var(--danger-color) !important; }
+        
+        .compact-height {
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+        .no-scroll {
+            overflow-x: hidden;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .transactions-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .simulation-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .brand-title {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            z-index: 1000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            letter-spacing: -0.02em;
+            text-shadow: none;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .portfolio-name-style {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            font-size: 1.25rem;
+        }
+        .portfolio-title-style {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            font-size: 1.6rem;
+        }
+        .brand-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            letter-spacing: 0.01em;
+            font-style: normal;
+        }
+        .main-content {
+            margin-top: 20px;
+        }
+        .chart-tabs .nav-link {
+            font-size: 0.9rem !important;
+            padding: 8px 12px !important;
+            border-radius: 8px !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-secondary) !important;
+            background-color: white !important;
+            margin: 0 2px !important;
+            transition: all 0.2s ease !important;
+            font-weight: 500 !important;
+        }
+        .chart-tabs .nav-link:hover {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--accent-blue) !important;
+            transform: translateY(-1px) !important;
+        }
+        .chart-tabs .nav-link.active {
+            background-color: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+            color: white !important;
+            box-shadow: 0 2px 4px rgb(37 99 235 / 0.2) !important;
+        }
+        .chart-tabs .nav-link i {
+            font-size: 0.8rem;
+        }
+        .portfolio-title-header {
+            position: absolute;
+            top: 20px;
+            /* Position to center over the 75% width charts column (col-md-9) */
+            left: calc(25% + 75% / 2);  /* 25% (left column) + center of 75% (charts column) */
+            transform: translateX(-50%);
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .user-menu {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .support-button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .support-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: white;
+        }
+        
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+        }
+        
+        .user-avatar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+        
+        .user-dropdown {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+            min-width: 220px;
+            padding: 8px 0;
+            margin-top: 8px;
+        }
+        
+        .user-dropdown-header {
+            padding: 12px 20px 8px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+        
+        .user-dropdown-header .user-name {
+            font-weight: 600;
+            color: var(--text-primary) !important;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        .user-dropdown-header .user-email {
+            font-size: 0.8rem;
+            color: var(--text-secondary) !important;
+            margin: 2px 0 0 0;
+        }
+        
+        .user-dropdown .dropdown-item {
+            padding: 10px 20px;
+            color: var(--text-primary) !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+        
+        .user-dropdown .dropdown-item:hover {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .user-dropdown .dropdown-item i {
+            width: 18px;
+            margin-right: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .user-dropdown .dropdown-item.text-danger {
+            color: var(--danger-color) !important;
+        }
+        
+        .user-dropdown .dropdown-item.text-danger:hover {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+        
+        .user-dropdown .dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 8px 0;
+        }
+        
+        .period-btn {
+            padding: 8px 16px !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            border-radius: 8px !important;
+            border: 1.5px solid var(--border-color) !important;
+            background-color: white !important;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s ease !important;
+            margin: 0 3px !important;
+        }
+        
+        .period-btn:hover {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--accent-blue) !important;
+            color: var(--primary-blue) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 4px rgb(59 130 246 / 0.15) !important;
+        }
+        
+        .period-btn.active {
+            background-color: #06b6d4 !important;  /* Cyan */
+            border-color: #06b6d4 !important;
+            color: white !important;
+            box-shadow: 0 3px 6px rgb(6 182 212 / 0.3) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-blue) !important;
+            border-color: var(--secondary-blue) !important;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--border-color) !important;
+            color: var(--text-secondary) !important;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--primary-blue) !important;
+            border-color: var(--primary-blue) !important;
+            color: white !important;
+        }
+        
+        /* Additional Bootstrap overrides */
+        .text-primary {
+            color: var(--primary-blue) !important;
+        }
+        
+        .text-success {
+            color: var(--success-color) !important;
+        }
+        
+        .text-danger {
+            color: var(--danger-color) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-blue) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+        
+        /* Support Modal Styles */
+        .support-modal-content {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .support-modal-header {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+            color: white !important;
+            border-bottom: none !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 20px 24px !important;
+        }
+        
+        .support-modal-header .modal-title {
+            font-weight: 600 !important;
+            font-size: 1.25rem !important;
+        }
+        
+        .support-modal-header .btn-close {
+            filter: invert(1) !important;
+            opacity: 0.8 !important;
+        }
+        
+        .support-modal-header .btn-close:hover {
+            opacity: 1 !important;
+        }
+        
+        .support-modal-body {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+            padding: 24px !important;
+        }
+        
+        .support-form-control {
+            background-color: var(--bg-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            border-radius: 8px !important;
+        }
+        
+        .support-form-control:focus {
+            background-color: var(--bg-primary) !important;
+            border-color: var(--primary-blue) !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25) !important;
+        }
+        
+        .support-form-control::placeholder {
+            color: var(--text-secondary) !important;
+            opacity: 0.7 !important;
+        }
+        
+        .support-modal-body .form-label {
+            color: var(--text-primary) !important;
+            font-weight: 500 !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .support-success-icon {
+            font-size: 3rem !important;
+            color: var(--success-color) !important;
+        }
+        
+        .support-error-icon {
+            font-size: 3rem !important;
+            color: var(--danger-color) !important;
+        }
+        
+        .support-submit-btn:disabled {
+            opacity: 0.6 !important;
+            cursor: not-allowed !important;
+        }
+    </style>
+    
+    <!-- ULTRA HIGH SPECIFICITY CSS TO FORCE BLUE THEME -->
+    <style>
+        /* Force ALL buttons to use blue theme with maximum specificity */
+        html body .btn.btn-primary,
+        html body button.btn-primary,
+        html body input[type="submit"].btn-primary,
+        html body .btn-primary {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+            color: white !important;
+        }
+        
+        html body .btn.btn-primary:hover,
+        html body .btn.btn-primary:focus,
+        html body .btn.btn-primary:active,
+        html body .btn-primary:hover,
+        html body .btn-primary:focus,
+        html body .btn-primary:active {
+            background-color: #1e40af !important;
+            border-color: #1e40af !important;
+            color: white !important;
+        }
+        
+        html body .btn.btn-success,
+        html body button.btn-success,
+        html body .btn-success {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            color: white !important;
+        }
+        
+        /* Force time period buttons with maximum specificity */
+        html body button.period-btn,
+        html body .period-btn {
+            padding: 8px 16px !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            border-radius: 8px !important;
+            border: 1.5px solid #e2e8f0 !important;
+            background-color: white !important;
+            color: #475569 !important;
+            transition: all 0.2s ease !important;
+            margin: 0 3px !important;
+        }
+        
+        html body button.period-btn:hover,
+        html body .period-btn:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #60a5fa !important;
+            color: #2563eb !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        html body button.period-btn.active,
+        html body .period-btn.active {
+            background-color: #06b6d4 !important;  /* Cyan */
+            border-color: #06b6d4 !important;
+            color: white !important;
+        }
+        
+        /* Force navigation pills with maximum specificity */
+        html body .nav.nav-pills .nav-link,
+        html body .nav-pills .nav-link {
+            background-color: white !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        html body .nav.nav-pills .nav-link:hover,
+        html body .nav-pills .nav-link:hover {
+            background-color: #f1f5f9 !important;
+            color: #2563eb !important;
+            border-color: #60a5fa !important;
+        }
+        
+        html body .nav.nav-pills .nav-link.active,
+        html body .nav-pills .nav-link.active {
+            background-color: #06b6d4 !important;  /* Cyan for nav pills too */
+            color: white !important;
+            border-color: #06b6d4 !important;
+        }
+        
+        /* Force cards with blue accents */
+        html body .card.card-metric,
+        html body .card-metric {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+    </style>
 </head>
-<body>
-    <div class="container-fluid">
-        <h1>Portfolio Suite - Test Page</h1>
-        <p>Current Portfolio: {{ current_portfolio }}</p>
-        <p>Total Positions: {{ positions|length }}</p>
-        
-        <div class="alert alert-success">
-            If you can see this page, the Django template system is working correctly.
-        </div>
-        
-        <!-- Support Modal Test -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supportModal">
-            Test Support Modal
+<body class="no-scroll" style="background-color: #0f172a !important; color: #e2e8f0 !important;">
+    <!-- User Menu in upper right corner -->
+    <div class="user-menu">
+        <!-- Contact Support Button -->
+        <button class="support-button" onclick="openSupportModal()" title="Contact Support">
+            <i class="fas fa-headset"></i>
         </button>
         
-        <!-- Support Modal -->
-        <div class="modal fade" id="supportModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Contact Support</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="dropdown">
+            <div class="user-avatar" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ request.user.first_name.0|default:request.user.username.0 }}{{ request.user.last_name.0|default:'' }}
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userMenuDropdown">
+                <li class="user-dropdown-header">
+                    <div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                    <div class="user-email">{{ request.user.email|default:'No email provided' }}</div>
+                </li>
+                <li><a class="dropdown-item" href="{% url 'change_user' %}">
+                    <i class="fas fa-user-edit"></i>Change User
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'goodbye' %}">
+                    <i class="fas fa-sign-out-alt"></i>Sign Out
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Brand Title in upper left corner -->
+    <div class="brand-title" style="color: #06b6d4 !important;">
+        Portfolio Suite
+        <div class="brand-subtitle" style="color: #94a3b8 !important;">Time makes all the difference</div>
+    </div>
+    
+    <!-- Portfolio Title in upper right corner -->
+    <div class="portfolio-title-header">
+        <h3 id="portfolioTitle" class="portfolio-title-style" style="color: #06b6d4 !important; margin: 0;">
+            {{ current_portfolio }}
+        </h3>
+    </div>
+    
+    <div class="container-fluid" style="margin-top: 80px;">
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-2" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Stock Color Legend removed to reduce visual clutter -->
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Column - Portfolio Summary & Buy/Sell Shares -->
+            <div class="col-md-3 pe-2">
+                <div>
+                <!-- Portfolio Name -->
+                <div class="card mb-3">
+                    <div class="card-header card-metric">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="fas fa-briefcase me-2"></i>
+                            <span id="portfolioName" class="portfolio-name-style" style="flex: 1; padding: 2px 8px;">
+                                {{ current_portfolio }}
+                            </span>
+                            
+                            <!-- Portfolio Selector Dropdown -->
+                            <div class="dropdown ms-2">
+                                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="portfolioSelector" data-bs-toggle="dropdown" aria-expanded="false" title="Switch Portfolio">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="portfolioSelector">
+                                    <li><h6 class="dropdown-header">Switch Portfolio</h6></li>
+                                    {% for portfolio in available_portfolios %}
+                                        <li>
+                                            <a class="dropdown-item {% if portfolio == current_portfolio %}active{% endif %}" 
+                                               href="javascript:void(0)" onclick="switchToPortfolio('{{ portfolio }}')">
+                                                <i class="fas fa-briefcase me-2"></i>{{ portfolio }}
+                                                {% if portfolio == current_portfolio %}
+                                                    <i class="fas fa-check ms-auto text-success"></i>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% empty %}
+                                        <li><span class="dropdown-item-text text-muted">No portfolios found</span></li>
+                                    {% endfor %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="createNewPortfolio()">
+                                            <i class="fas fa-plus me-2 text-success"></i>Create New Portfolio
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </h5>
                     </div>
-                    <div class="modal-body">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h6 style="color: #94a3b8 !important;">Total Invested</h6>
+                                <h4 style="color: #60a5fa !important; font-weight: 700;">${{ summary.net_invested|floatformat:2|intcomma }}</h4>
+                            </div>
+                            <div class="col-6">
+                                <h6 style="color: #94a3b8 !important;">Companies</h6>
+                                <h4 style="color: #60a5fa !important; font-weight: 700;">{{ summary.companies_count }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Positions -->
+                <div class="card mb-3">
+                    <div class="card-header card-metric">
+                        <h6 class="mb-0"><i class="fas fa-list me-2"></i>Current Positions</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 200px;">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead style="background-color: #475569 !important;">
+                                    <tr>
+                                        <th style="color: #e2e8f0 !important; font-weight: 600; background-color: #475569 !important;">Symbol</th>
+                                        <th style="color: #e2e8f0 !important; font-weight: 600; background-color: #475569 !important;">Shares</th>
+                                        <th style="color: #e2e8f0 !important; font-weight: 600; background-color: #475569 !important;">Avg Cost</th>
+                                        <th style="color: #e2e8f0 !important; font-weight: 600; background-color: #475569 !important;">Current</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position in positions %}
+                                    <tr class="position-row" style="cursor: pointer;" 
+                                        onclick="populateFormFromPosition('{{ position.symbol }}', {{ position.quantity|floatformat:0 }})" 
+                                        onmouseover="this.style.backgroundColor='#f8f9fa'" 
+                                        onmouseout="this.style.backgroundColor='transparent'" 
+                                        title="Click to auto-fill form with {{ position.symbol }}">
+                                        <td><strong style="color: #60a5fa !important; font-size: 14px;">{{ position.symbol }}</strong></td>
+                                        <td style="color: #e2e8f0 !important; font-weight: 500;">{{ position.quantity|floatformat:0 }}</td>
+                                        <td style="color: #94a3b8 !important; font-weight: 500;">${{ position.avg_cost|floatformat:2|intcomma }}</td>
+                                        <td>
+                                            {% if position.current_price %}
+                                                <div class="d-flex flex-column">
+                                                    <strong class="text-success">${{ position.current_price|floatformat:2|intcomma }}</strong>
+                                                    {% if position.gain_loss_pct %}
+                                                        <small class="{% if position.gain_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                                            {% if position.gain_loss_pct >= 0 %}+{% endif %}{{ position.gain_loss_pct|floatformat:2 }}%
+                                                        </small>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <div class="d-flex align-items-center">
+                                                    <small class="text-muted me-2">N/A</small>
+                                                    <button class="btn btn-outline-secondary btn-sm" 
+                                                            onclick="fetchPriceForSymbol('{{ position.symbol }}')"
+                                                            title="Fetch current price">
+                                                        <i class="fas fa-refresh fa-xs"></i>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No positions yet</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buy/Sell Shares Form -->
+                <div class="card mb-3">
+                    <div class="card-header card-metric">
+                        <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Buy/Sell Shares</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'add_transaction' %}">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <label class="form-label">{{ transaction_form.symbol.label }}</label>
+                                {{ transaction_form.symbol }}
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">{{ transaction_form.transaction_type.label }}</label>
+                                {{ transaction_form.transaction_type }}
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">{{ transaction_form.quantity.label }}</label>
+                                {{ transaction_form.quantity }}
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">{{ transaction_form.price_per_share.label }}</label>
+                                {{ transaction_form.price_per_share }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ transaction_form.notes.label }}</label>
+                                {{ transaction_form.notes }}
+                            </div>
+                            <button type="submit" style="width: 100%; padding: 8px 16px; font-size: 0.9rem; font-weight: 500; border-radius: 6px; border: none; background-color: #06b6d4; color: white; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#0891b2'" onmouseout="this.style.backgroundColor='#06b6d4'">Add Transaction</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Update Prices Button -->
+                <div class="d-grid gap-2 mb-2">
+                    <form method="post" action="{% url 'update_prices' %}">
+                        {% csrf_token %}
+                        <button type="submit" style="width: 100%; padding: 6px 12px; font-size: 0.8rem; font-weight: 500; border-radius: 6px; border: none; background-color: #10b981; color: white; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'">
+                            <i class="fas fa-refresh me-2"></i>Update Prices
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Generate Report Button -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'generate_portfolio_report' %}" class="btn btn-info btn-sm w-100" target="_blank">
+                        <i class="fas fa-file-pdf me-2"></i>Generate Report
+                    </a>
+                </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Portfolio Performance & Transactions -->
+            <div class="col-md-9 px-1">
+                <!-- Portfolio Title (moved next to the brand title) -->
+                <!-- Right Column - Portfolio Performance & Transactions -->
+                
+                <!-- Chart Tabs and Charts -->
+                <div class="card mb-3" style="min-height: 600px;">
+                    <div class="card-body p-2">
+                        <!-- Time Period Buttons (for performance charts) -->
+                        <div id="timePeriodButtons" class="d-flex justify-content-start mb-3" role="group" style="padding-left: 50px;">
+                            <button type="button" data-period="1W" onclick="updateChart('1W')" class="period-btn active-period">1W</button>
+                            <button type="button" data-period="1M" onclick="updateChart('1M')" class="period-btn">1M</button>
+                            <button type="button" data-period="6M" onclick="updateChart('6M')" class="period-btn">6M</button>
+                            <button type="button" data-period="1Y" onclick="updateChart('1Y')" class="period-btn">1Y</button>
+                            <button type="button" data-period="5Y" onclick="updateChart('5Y')" class="period-btn">5Y</button>
+                            <button type="button" data-period="10Y" onclick="updateChart('10Y')" class="period-btn">10Y</button>
+                            <button type="button" data-period="20Y" onclick="updateChart('20Y')" class="period-btn">20Y</button>
+                        </div>
+                        
+                        <!-- Stock Selector (for historical performance chart) -->
+                        <div id="stockSelector" class="mb-2" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold text-muted" style="font-size: 0.9rem;">Select Stock:</span>
+                                <span id="currentStockPrice" class="badge bg-secondary" style="display: none;"></span>
+                            </div>
+                            <div class="btn-group w-100" role="group" id="stockButtons">
+                                <!-- Stock buttons will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Chart Containers -->
+                        <div class="chart-container" style="height: 490px;">
+                            <canvas id="portfolioChart"></canvas>
+                            <canvas id="sectorChart" style="display: none;"></canvas>
+                        </div>
+                        
+                        <!-- Holdings Detail Container (initially hidden) -->
+                        <div id="holdingsDetailContainer" class="chart-container" style="height: 490px; display: none; overflow-y: auto;">
+                            <div class="table-responsive h-100">
+                                <table class="table table-hover mb-0" style="font-size: 14px;">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Company</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Purchase Date</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Weight</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Entry Price</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Current Price</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">P&L</th>
+                                            <th style="font-size: 14px; padding: 12px 16px;">Time Owned</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for holding in detailed_holdings %}
+                                        <tr>
+                                            <td style="font-size: 14px; padding: 12px 16px; line-height: 1.3;">
+                                                <strong style="font-size: 16px; color: #60a5fa;">{{ holding.symbol }}</strong>
+                                            </td>
+                                            <td style="font-size: 14px; padding: 12px 16px; color: #94a3b8;">{{ holding.purchase_date|date:"M d, Y" }}</td>
+                                            <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #94a3b8;">{{ holding.weight_pct|floatformat:1 }}%</td>
+                                            <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2|intcomma }}</td>
+                                        <td style="font-size: 14px; padding: 12px 16px;">
+                                            {% if holding.current_value %}
+                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2|intcomma }}</span>
+                                            {% endif %}
+                                        </td>
+                                            <td style="font-size: 14px; padding: 12px 16px;">
+                                                {% if holding.performance_pct %}
+                                                    <span class="{% if holding.performance_pct >= 0 %}gain-positive{% else %}gain-negative{% endif %}" style="font-weight: 700; font-size: 15px;">
+                                                        {% if holding.performance_pct >= 0 %}+{% endif %}{{ holding.performance_pct|floatformat:1 }}%
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="font-size: 14px; padding: 12px 16px; color: #60a5fa;">{{ holding.time_owned }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted" style="font-size: 16px; padding: 40px;">No holdings yet</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Chart Tabs at BOTTOM (traditional layout) -->
+                        <ul class="nav nav-pills nav-justified mt-2 chart-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active chart-tab" data-chart="performance-inception" onclick="switchChart('performance-inception')">
+                                    <i class="fas fa-chart-line me-1"></i>Performance since inception
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link chart-tab" data-chart="historical-performance" onclick="switchChart('historical-performance')">
+                                    <i class="fas fa-history me-1"></i>Historical Performance
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link chart-tab" data-chart="sector-allocation" onclick="switchChart('sector-allocation')">
+                                    <i class="fas fa-chart-pie me-1"></i>Sector allocation
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Holdings Detail Toggle Button (outside chart card to prevent overlap) -->
+                <div class="d-flex justify-content-center mb-2">
+                    <button class="btn" id="holdingsToggleBtn" onclick="toggleHoldingsDetail()" style="font-size: 1.25rem; font-weight: 500; background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px;">
+                        <i class="fas fa-table me-2"></i>Show Holdings Detail
+                    </button>
+                </div>
+                
+                <!-- Holdings Detail Table (initially hidden, appears below charts) -->
+                <div id="holdingsDetailCard" class="card mb-3" style="display: none;">
+                    <div class="card-header card-metric">
+                        <h5 class="mb-0"><i class="fas fa-table me-2"></i>Holdings Detail</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" style="font-size: 14px;">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Company</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Purchase Date</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Weight</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Entry Price</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Current Price</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">P&L</th>
+                                        <th style="font-size: 14px; padding: 12px 16px;">Time Owned</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for holding in detailed_holdings %}
+                                    <tr>
+                                        <td style="font-size: 14px; padding: 12px 16px; line-height: 1.3;">
+                                            <strong style="font-size: 16px; color: #60a5fa;">{{ holding.symbol }}</strong>
+                                        </td>
+                                        <td style="font-size: 14px; padding: 12px 16px; color: #94a3b8;">{{ holding.purchase_date|date:"M d, Y" }}</td>
+                                        <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #94a3b8;">{{ holding.weight_pct|floatformat:1 }}%</td>
+                                        <td style="font-size: 14px; padding: 12px 16px; font-weight: 600; color: #60a5fa;">${{ holding.entry_price|floatformat:2|intcomma }}</td>
+                                        <td style="font-size: 14px; padding: 12px 16px;">
+                                            {% if holding.current_value %}
+                                                <span style="font-weight: 600; color: #28a745;">${{ holding.current_value|floatformat:2|intcomma }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="font-size: 14px; padding: 12px 16px;">
+                                            {% if holding.performance_pct %}
+                                                <span class="{% if holding.performance_pct >= 0 %}gain-positive{% else %}gain-negative{% endif %}" style="font-weight: 700; font-size: 15px;">
+                                                    {% if holding.performance_pct >= 0 %}+{% endif %}{{ holding.performance_pct|floatformat:1 }}%
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="font-size: 14px; padding: 12px 16px; color: #60a5fa;">{{ holding.time_owned }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted" style="font-size: 16px; padding: 40px;">No holdings yet</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings and Dividends Row -->
+                <div class="row">
+                    <!-- Earnings Date Column -->
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-header card-metric">
+                                <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Earnings</h6>
+                            </div>
+                            <div class="card-body p-2">
+                                {% for earning in upcoming_earnings %}
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div>
+                                        <strong style="font-size: 13px;">{{ earning.symbol }}</strong>
+                                        <br><small class="text-muted" style="font-size: 11px;">{{ earning.company_name|default:"N/A" }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div style="font-size: 12px; font-weight: 600;">{{ earning.earnings_date|default:"TBD" }}</div>
+                                        <small class="text-muted" style="font-size: 11px;">{{ earning.time_until|default:"" }}</small>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <small>No upcoming earnings</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dividends Date Column -->
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-header card-metric">
+                                <h6 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Upcoming Dividends</h6>
+                            </div>
+                            <div class="card-body p-2">
+                                {% for dividend in upcoming_dividends %}
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div>
+                                        <strong style="font-size: 13px;">{{ dividend.symbol }}</strong>
+                                        <br><small class="text-muted" style="font-size: 11px;">{{ dividend.yield_pct|floatformat:1 }}% yield</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div style="font-size: 12px; color: #28a745; font-weight: 600;">${{ dividend.expected_amount|floatformat:2|intcomma }}</div>
+                                        <small class="text-muted" style="font-size: 11px;">{{ dividend.ex_date|default:"TBD" }}</small>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <small>No upcoming dividends</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal fade" id="supportModal" tabindex="-1" aria-labelledby="supportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content support-modal-content">
+                <div class="modal-header support-modal-header">
+                    <h5 class="modal-title" id="supportModalLabel">
+                        <i class="fas fa-headset me-2"></i>Contact Support
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body support-modal-body">
+                    <div id="supportFormContainer">
                         <form id="supportForm" data-support-url="{% url 'create_support_message' %}">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <label for="supportSubject" class="form-label">Subject</label>
-                                <input type="text" class="form-control" id="supportSubject" name="subject" required>
+                                <label for="supportSubject" class="form-label">Subject <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control support-form-control" id="supportSubject" name="subject" required maxlength="200" placeholder="Brief description of your issue">
                             </div>
                             <div class="mb-3">
-                                <label for="supportMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="supportMessage" name="message" rows="3" required></textarea>
+                                <label for="supportPriority" class="form-label">Priority</label>
+                                <select class="form-select support-form-control" id="supportPriority" name="priority">
+                                    <option value="LOW">Low - General question or minor issue</option>
+                                    <option value="MEDIUM" selected>Medium - Standard support request</option>
+                                    <option value="HIGH">High - Important issue affecting functionality</option>
+                                    <option value="URGENT">Urgent - Critical system issue</option>
+                                </select>
                             </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            <div class="mb-3">
+                                <label for="supportMessage" class="form-label">Message <span class="text-danger">*</span></label>
+                                <textarea class="form-control support-form-control" id="supportMessage" name="message" rows="5" required placeholder="Please describe your issue in detail, including steps to reproduce if applicable..."></textarea>
+                            </div>
+                            <div class="text-muted small mb-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Our support team typically responds within 24-48 hours depending on priority level.
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary support-submit-btn">
+                                    <i class="fas fa-paper-plane me-1"></i>Send Message
+                                </button>
                             </div>
                         </form>
+                    </div>
+                    
+                    <div id="supportSuccessMessage" class="text-center" style="display: none;">
+                        <div class="support-success-icon mb-3">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h4 class="text-success mb-2">Message Sent Successfully!</h4>
+                        <p class="text-muted">Thank you for contacting support. We have received your message and will get back to you soon.</p>
+                        <p class="small text-muted mb-3">
+                            <strong>Reference ID:</strong> <span id="supportReferenceId"></span>
+                        </p>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            <i class="fas fa-check me-1"></i>Close
+                        </button>
+                    </div>
+                    
+                    <div id="supportErrorMessage" class="text-center" style="display: none;">
+                        <div class="support-error-icon mb-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h4 class="text-danger mb-2">Error Sending Message</h4>
+                        <p class="text-muted mb-3" id="supportErrorText">There was an error sending your support message. Please try again.</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Close
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="resetSupportForm()">
+                                <i class="fas fa-redo me-1"></i>Try Again
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('supportForm').addEventListener('submit', function(event) {
+        let portfolioChart;
+        let currentPeriod = '1W';
+        
+        // Auto-uppercase stock symbols
+        document.addEventListener('DOMContentLoaded', function() {
+            const symbolInputs = document.querySelectorAll('input[name="symbol"], input[name="symbols"]');
+            symbolInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            });
+            
+            // Initialize portfolio chart
+            initializeChart();
+            
+            // Setup symbol autocomplete
+            setupSymbolAutocomplete();
+            
+            // Set initial chart state to historical-performance to show time period controls and 1D intraday data
+            switchChart('historical-performance');
+        });
+        
+        // Portfolio name editing functions removed - now managed only through dropdown
+        
+        // Function to populate form from clicked position
+        function populateFormFromPosition(symbol, quantity) {
+            // Get form fields
+            const symbolField = document.querySelector('input[name="symbol"]');
+            const quantityField = document.querySelector('input[name="quantity"]');
+            const transactionTypeField = document.querySelector('select[name="transaction_type"]');
+            
+            if (symbolField && quantityField) {
+                // Populate symbol field
+                symbolField.value = symbol;
+                
+                // Populate quantity field (for selling the full position)
+                quantityField.value = quantity;
+                
+                // Set transaction type to SELL (most common action for existing positions)
+                if (transactionTypeField) {
+                    transactionTypeField.value = 'SELL';
+                }
+                
+                // Add visual feedback
+                symbolField.style.backgroundColor = '#e8f5e8';
+                quantityField.style.backgroundColor = '#e8f5e8';
+                
+                // Remove highlight after 1 second
+                setTimeout(() => {
+                    symbolField.style.backgroundColor = '';
+                    quantityField.style.backgroundColor = '';
+                }, 1000);
+                
+                // Focus on notes field for user to add any notes
+                const notesField = document.querySelector('textarea[name="notes"]');
+                if (notesField) {
+                    notesField.focus();
+                }
+                
+                // Fetch current price for the symbol
+                fetchStockPrice(symbol);
+            }
+        }
+
+        // Auto-complete functionality for symbol field
+        let searchTimeout;
+        let isSelectingOption = false;
+        
+        function setupSymbolAutocomplete() {
+            const symbolField = document.querySelector('input[name="symbol"]');
+            if (!symbolField) return;
+            
+            const resultsDiv = document.createElement('div');
+            resultsDiv.className = 'symbol-search-results';
+            resultsDiv.style.cssText = `
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                border: 1px solid #d1d5db;
+                border-top: none;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+                display: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                border-radius: 0 0 8px 8px;
+            `;
+            
+            // Make symbol field container relative
+            symbolField.parentElement.style.position = 'relative';
+            symbolField.parentElement.appendChild(resultsDiv);
+            
+            symbolField.addEventListener('input', function() {
+                if (isSelectingOption) {
+                    isSelectingOption = false;
+                    return;
+                }
+                
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+                
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchSymbols(query, resultsDiv);
+                }, 300);
+            });
+            
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!symbolField.contains(e.target) && !resultsDiv.contains(e.target)) {
+                    resultsDiv.style.display = 'none';
+                }
+            });
+        }
+        
+        function searchSymbols(query, resultsDiv) {
+            fetch(`/api/stock-search/?q=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultsDiv.innerHTML = '';
+                
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(result => {
+                        const option = document.createElement('div');
+                        option.style.cssText = `
+                            padding: 10px 14px;
+                            cursor: pointer;
+                            border-bottom: 1px solid #e5e7eb;
+                            color: #374151;
+                            line-height: 1.4;
+                        `;
+                        // Safely create content to prevent XSS
+                        const symbolStrong = document.createElement('strong');
+                        symbolStrong.style.color = '#1f2937'; // Dark gray for symbol
+                        symbolStrong.style.fontWeight = '600';
+                        symbolStrong.textContent = result.symbol;
+                        
+                        const nameSpan = document.createTextNode(' - ' + result.name);
+                        const lineBreak = document.createElement('br');
+                        
+                        const typeSmall = document.createElement('small');
+                        typeSmall.style.color = '#6b7280'; // Medium gray for type/region
+                        typeSmall.style.fontSize = '0.875rem';
+                        typeSmall.textContent = `${result.type} • ${result.region}`;
+                        
+                        option.appendChild(symbolStrong);
+                        option.appendChild(nameSpan);
+                        option.appendChild(lineBreak);
+                        option.appendChild(typeSmall);
+                        
+                        option.addEventListener('mouseenter', function() {
+                            this.style.backgroundColor = '#f3f4f6';
+                            this.style.color = '#111827'; // Darker text on hover
+                        });
+                        
+                        option.addEventListener('mouseleave', function() {
+                            this.style.backgroundColor = '#ffffff';
+                            this.style.color = '#374151'; // Return to normal text color
+                        });
+                        
+                        option.addEventListener('click', function() {
+                            isSelectingOption = true;
+                            document.querySelector('input[name="symbol"]').value = result.symbol;
+                            resultsDiv.style.display = 'none';
+                            fetchStockPrice(result.symbol);
+                        });
+                        
+                        resultsDiv.appendChild(option);
+                    });
+                    
+                    resultsDiv.style.display = 'block';
+                } else {
+                    resultsDiv.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error searching symbols:', error);
+                resultsDiv.style.display = 'none';
+            });
+        }
+        
+        function fetchStockPrice(symbol) {
+            // Show loading indicator
+            const priceField = document.querySelector('input[name="price_per_share"]');
+            if (priceField) {
+                priceField.value = 'Loading...';
+                priceField.disabled = true;
+            }
+            
+            fetch(`/api/stock-price/?symbol=${encodeURIComponent(symbol)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (priceField) {
+                    if (data.price) {
+                        priceField.value = parseFloat(data.price).toFixed(2);
+                    } else {
+                        priceField.value = '';
+                        priceField.placeholder = 'Price not available';
+                    }
+                    priceField.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stock price:', error);
+                if (priceField) {
+                    priceField.value = '';
+                    priceField.placeholder = 'Price fetch failed';
+                    priceField.disabled = false;
+                }
+            });
+        }
+        
+        function fetchPriceForSymbol(symbol) {
+            // Function to fetch price for a specific symbol in the positions table
+            fetch(`/api/stock-price/?symbol=${encodeURIComponent(symbol)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.price) {
+                    // Refresh the page to show updated prices
+                    window.location.reload();
+                } else {
+                    alert(`Unable to fetch price for ${symbol}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stock price:', error);
+                alert(`Error fetching price for ${symbol}`);
+            });
+        }
+        
+        // Chart functions
+        let sectorChart;
+        let currentChart = 'performance-inception';
+        
+        function initializeChart() {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            
+            // Set dark background for chart canvas
+            ctx.canvas.style.backgroundColor = '#1e293b';
+            
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: [],
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                font: {
+                                    size: 11
+                                },
+                                color: '#e2e8f0',
+                                usePointStyle: true,
+                                filter: function(legendItem, chartData) {
+                                    // Show legend only for performance since inception chart
+                                    return currentChart === 'performance-inception';
+                                }
+                            }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(51, 65, 85, 0.95)',
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        borderColor: '#475569',
+                        borderWidth: 1,
+                        cornerRadius: 10,
+                        displayColors: true,
+                        padding: 16,
+                        titleFont: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14,
+                            weight: '500'
+                        },
+                        footerFont: {
+                            size: 12
+                        },
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                // Show the exact date/time as title
+                                const label = tooltipItems[0].label;
+                                if (currentChart === 'historical-performance') {
+                                    // For historical performance, show full date
+                                    if (currentPeriod === '1D') {
+                                        const today = new Date().toLocaleDateString('en-US', { 
+                                            weekday: 'long', 
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric' 
+                                        });
+                                        return `${today} at ${label}`;
+                                    } else {
+                                        return label;
+                                    }
+                                }
+                                return label;
+                            },
+                            label: function(context) {
+                                const stockSymbol = context.dataset.label;
+                                const price = context.parsed.y;
+                                
+                                if (currentChart === 'performance-inception') {
+                                    // Show percentage for inception chart
+                                    return stockSymbol + ': ' + (price >= 0 ? '+' : '') + price.toFixed(2) + '%';
+                                } else if (currentChart === 'historical-performance') {
+                                    // Show both percentage and actual price for historical performance chart
+                                    const percentageChange = (price >= 0 ? '+' : '') + price.toFixed(2) + '%';
+                                    
+                                    // Check if we have actual price data from the dataset
+                                    let actualPrice = null;
+                                    const dataset = context.dataset;
+                                    const dataIndex = context.dataIndex;
+                                    
+                                    if (dataset.actualPrices && dataset.actualPrices[dataIndex]) {
+                                        // Use real historical price data
+                                        const priceData = dataset.actualPrices[dataIndex];
+                                        actualPrice = typeof priceData === 'object' ? priceData.actual_price : priceData;
+                                    }
+                                    
+                                    if (actualPrice !== null) {
+                                        // Show real historical price
+                                        const priceDisplay = '$' + parseFloat(actualPrice).toFixed(2);
+                                        return stockSymbol + ': ' + percentageChange + ' (' + priceDisplay + ')';
+                                    } else {
+                                        // Fallback to estimated price calculation
+                                        let basePrice = 150; // fallback
+                                        switch(stockSymbol) {
+                                            case 'BRK-B':
+                                            case 'BRK.B':
+                                                basePrice = 489.72;
+                                                break;
+                                            case 'O':
+                                                basePrice = 59.01;
+                                                break;
+                                            case 'DE':
+                                                basePrice = 497.72;
+                                                break;
+                                            case 'GOOG':
+                                            case 'GOOGL':
+                                                basePrice = 205.34;
+                                                break;
+                                            case 'AAPL':
+                                                basePrice = 175.50;
+                                                break;
+                                            case 'MSFT':
+                                                basePrice = 342.75;
+                                                break;
+                                            case 'TSLA':
+                                                basePrice = 248.50;
+                                                break;
+                                            case 'NVDA':
+                                                basePrice = 415.20;
+                                                break;
+                                        }
+                                        
+                                        // Calculate estimated price based on percentage change
+                                        const estimatedPrice = basePrice * (1 + price / 100);
+                                        const priceDisplay = '$' + estimatedPrice.toFixed(2);
+                                        
+                                        // Return single line with both percentage and estimated price
+                                        return stockSymbol + ': ' + percentageChange + ' (Est. ' + priceDisplay + ')';
+                                    }
+                                } else {
+                                    // Show dollar value for other charts
+                                    return stockSymbol + ': $' + price.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                                }
+                            },
+                        }
+                    }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                display: false,
+                                color: '#475569'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                color: '#475569'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    if (currentChart === 'performance-inception' || currentChart === 'historical-performance') {
+                                        // Show percentage for inception and historical performance charts
+                                        return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+                                    } else {
+                                        // Show dollar value for other charts
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 0,
+                            hoverRadius: 4
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+            
+            // Initialize sector chart (pie chart)
+            const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+            
+            // Set dark background for sector chart canvas
+            sectorCtx.canvas.style.backgroundColor = '#1e293b';
+            
+            sectorChart = new Chart(sectorCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#06b6d4', '#f59e0b', '#8b5cf6', '#10b981',
+                            '#ef4444', '#3b82f6', '#f97316', '#84cc16',
+                            '#ec4899', '#6366f1', '#14b8a6', '#a855f7'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#0f172a'
+                    }]
+                },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        boxWidth: 18,
+                                        padding: 15,
+                                        font: {
+                                            size: 16,
+                                            weight: 600
+                                        },
+                                        color: '#e2e8f0',
+                                        usePointStyle: false
+                                    },
+                                    align: 'center'
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(51, 65, 85, 0.95)',
+                                    titleColor: '#e2e8f0',
+                                    bodyColor: '#94a3b8',
+                                    borderColor: '#475569',
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const percentage = ((value / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                                            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    left: 20,
+                                    right: 120,
+                                    top: 15,
+                                    bottom: 15
+                                }
+                            }
+                        }
+            });
+            
+            // Initial chart data will be loaded by switchChart('performance-inception')
+        }
+        
+        // Global variables for stock selection
+        let availableStocks = [];
+        let currentSelectedStock = null;
+        
+        // Chart switching function
+        function switchChart(chartType) {
+            // Update active tab
+            document.querySelectorAll('.chart-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-chart="${chartType}"]`).classList.add('active');
+            
+            currentChart = chartType;
+            
+            // Show/hide appropriate chart and controls
+            const portfolioChartCanvas = document.getElementById('portfolioChart');
+            const sectorChartCanvas = document.getElementById('sectorChart');
+            const timePeriodButtons = document.getElementById('timePeriodButtons');
+            const stockSelector = document.getElementById('stockSelector');
+            
+            console.log('Switching to chart:', chartType); // Debug log
+            
+            if (chartType === 'sector-allocation') {
+                portfolioChartCanvas.style.display = 'none';
+                sectorChartCanvas.style.display = 'block';
+                timePeriodButtons.style.setProperty('display', 'none', 'important');
+                stockSelector.style.display = 'none';
+                
+                console.log('Sector chart: hiding time period buttons'); // Debug log
+                
+                // Hide legend for sector chart
+                portfolioChart.options.plugins.legend.display = false;
+                
+                // Load sector data
+                loadSectorChart();
+            } else if (chartType === 'performance-inception') {
+                portfolioChartCanvas.style.display = 'block';
+                sectorChartCanvas.style.display = 'none';
+                timePeriodButtons.style.setProperty('display', 'none', 'important'); // Hide time frames for inception chart
+                stockSelector.style.display = 'none';
+                
+                console.log('Inception chart: hiding time period buttons'); // Debug log
+                
+                // Show legend for inception chart
+                portfolioChart.options.plugins.legend.display = true;
+                portfolioChart.update();
+                
+                // Load performance since inception data
+                loadPerformanceSinceInception();
+            } else if (chartType === 'historical-performance') {
+                portfolioChartCanvas.style.display = 'block';
+                sectorChartCanvas.style.display = 'none';
+                timePeriodButtons.style.setProperty('display', 'flex', 'important'); // Show time frames for historical chart
+                stockSelector.style.display = 'none'; // Hide stock selector for multiple stock chart
+                
+                console.log('Historical chart: showing time period buttons'); // Debug log
+                
+                // Show legend for multiple stock chart
+                portfolioChart.options.plugins.legend.display = true;
+                portfolioChart.update();
+                
+                // Load historical performance with multiple stocks
+                updateHistoricalChart(currentPeriod);
+            }
+        }
+        
+        function loadSectorChart() {
+            fetch('/api/sector-allocation/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                sectorChart.data.labels = data.labels;
+                sectorChart.data.datasets[0].data = data.values;
+                sectorChart.update();
+            })
+            .catch(error => {
+                console.error('Error fetching sector data:', error);
+                // Show sample data
+                sectorChart.data.labels = ['Technology', 'Healthcare', 'Financials', 'Consumer Staples'];
+                sectorChart.data.datasets[0].data = [5000, 3000, 2000, 1500];
+                sectorChart.update();
+            });
+        }
+        
+        function loadPerformanceSinceInception() {
+            fetch('/api/performance-since-inception/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the datasets to use centralized color function
+                if (data.datasets && data.datasets.length > 0) {
+                    data.datasets.forEach(dataset => {
+                        if (dataset.label !== 'Portfolio Average') {
+                            const color = getStockColor(dataset.label);
+                            dataset.borderColor = color;
+                            dataset.backgroundColor = color + '20'; // Add 20 for transparency
+                        }
+                    });
+                }
+                
+                portfolioChart.data.labels = data.labels;
+                portfolioChart.data.datasets = data.datasets;
+                portfolioChart.update();
+            })
+            .catch(error => {
+                console.error('Error fetching performance since inception data:', error);
+                
+                // Get actual portfolio stocks
+                const portfolioStocks = getPortfolioStocks();
+                const stocksToShow = portfolioStocks.length > 0 ? portfolioStocks : ['BRK-B', 'O', 'DE', 'GOOG'];
+                
+                // Create sample datasets for each stock with consistent colors using centralized function
+                const sampleDatasets = stocksToShow.map((symbol, index) => {
+                    const color = getStockColor(symbol);
+                    
+                    // Generate sample performance data (percentage gains)
+                    const performance = [
+                        0, // Start at 0%
+                        Math.random() * 10 - 2, // Random between -2% and 8%
+                        Math.random() * 20 - 5   // Random between -5% and 15%
+                    ];
+                    
+                    return {
+                        label: symbol,
+                        data: performance,
+                        borderColor: color,
+                        backgroundColor: color + '20', // Add 20 for transparency
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    };
+                });
+                
+                // Add Portfolio Average line
+                sampleDatasets.push({
+                    label: 'Portfolio Average',
+                    data: [0, 3.8, 8.5],
+                    borderColor: '#22d3ee', // Light cyan for Portfolio Average
+                    backgroundColor: '#22d3ee20',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderDash: [5, 5]
+                });
+                
+                // Use realistic dates representing "since inception" (from first stock purchase)
+                const inceptionDate = new Date('2024-08-19'); // First stock purchase date: August 19, 2024
+                const currentDate = new Date();
+                const monthsElapsed = Math.floor((currentDate - inceptionDate) / (1000 * 60 * 60 * 24 * 30));
+                
+                const inceptionLabels = [];
+                for (let i = 0; i <= Math.min(monthsElapsed, 6); i += 2) { // Show every 2 months up to 6 months
+                    const labelDate = new Date(inceptionDate);
+                    labelDate.setMonth(labelDate.getMonth() + i);
+                    inceptionLabels.push(labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
+                }
+                
+                portfolioChart.data.labels = inceptionLabels;
+                portfolioChart.data.datasets = sampleDatasets;
+                portfolioChart.update();
+            });
+        }
+        
+        function updateChart(period) {
+            // Route to appropriate chart update function based on current chart type
+            if (currentChart === 'historical-performance') {
+                updateHistoricalChart(period);
+            } else {
+                // Original portfolio performance chart
+                // Update active button using CSS classes
+                document.querySelectorAll('[data-period]').forEach(btn => {
+                    btn.classList.remove('active-period');
+                    
+                    if (btn.dataset.period === period) {
+                        btn.classList.add('active-period');
+                    }
+                });
+                
+                currentPeriod = period;
+                
+                // Fetch chart data
+                fetch(`/chart-data/?period=${period}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        portfolioChart.data.labels = data.labels;
+                        portfolioChart.data.datasets[0].data = data.values;
+                        portfolioChart.update();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching chart data:', error);
+                        // Show sample data if no real data available
+                        showSampleChartData(period);
+                    });
+            }
+        }
+        
+        function updateHistoricalChart(period) {
+            // Update active button using CSS classes
+            document.querySelectorAll('[data-period]').forEach(btn => {
+                btn.classList.remove('active-period');
+                
+                if (btn.dataset.period === period) {
+                    btn.classList.add('active-period');
+                }
+            });
+            
+            currentPeriod = period;
+            
+            // Configure chart for percentage changes (show percentage values on Y-axis)
+            portfolioChart.options.scales.y.ticks.callback = function(value) {
+                return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+            };
+            
+            // Configure tooltips to show company names with percentage changes
+            portfolioChart.options.plugins.tooltip.callbacks.label = function(context) {
+                const percentage = context.parsed.y;
+                return context.dataset.label + ': ' + (percentage >= 0 ? '+' : '') + percentage.toFixed(2) + '%';
+            };
+            
+            // Show legend for multiple stock lines
+            portfolioChart.options.plugins.legend.display = true;
+            
+            // Load real historical performance data first, fallback to realistic simulated data
+            console.log('Loading real historical performance data');
+            fetchRealHistoricalData(period);
+        }
+        
+        function showSampleChartData(period) {
+            let labels, values;
+            const baseValue = 10000;
+            
+            switch(period) {
+                case '1D':
+                    // Full day progression from midnight to current time
+                    const currentHour = new Date().getHours();
+                    const currentMinute = new Date().getMinutes();
+                    labels = [];
+                    values = [];
+                    
+                    // Generate hourly labels from 00:00 to current time
+                    for (let hour = 0; hour <= currentHour; hour++) {
+                        if (hour === currentHour && currentMinute < 30) {
+                            // Only show current hour if we're past 30 minutes
+                            continue;
+                        }
+                        const timeLabel = hour === 0 ? '12:00 AM' : 
+                                         hour === 12 ? '12:00 PM' :
+                                         hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`;
+                        labels.push(timeLabel);
+                        
+                        // Generate realistic intraday price movement
+                        let priceMultiplier;
+                        if (hour < 6) {
+                            // Pre-market: minimal change
+                            priceMultiplier = 1 + (Math.random() - 0.5) * 0.002; // ±0.2%
+                        } else if (hour >= 9 && hour <= 16) {
+                            // Market hours: more volatility
+                            priceMultiplier = 1 + (Math.random() - 0.5) * 0.02; // ±2%
+                        } else {
+                            // After hours: moderate change
+                            priceMultiplier = 1 + (Math.random() - 0.5) * 0.005; // ±0.5%
+                        }
+                        
+                        if (values.length === 0) {
+                            values.push(baseValue);
+                        } else {
+                            values.push(values[values.length - 1] * priceMultiplier);
+                        }
+                    }
+                    
+                    // If it's early morning, add at least a few hours
+                    if (labels.length < 3) {
+                        labels = ['12:00 AM', '3:00 AM', '6:00 AM'];
+                        values = [baseValue, baseValue * 1.001, baseValue * 1.002];
+                    }
+                    break;
+                case '1W':
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+                    values = [baseValue, baseValue * 1.05, baseValue * 0.97, baseValue * 1.08, baseValue * 1.12];
+                    break;
+                case '1M':
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    values = [baseValue, baseValue * 1.15, baseValue * 1.08, baseValue * 1.25];
+                    break;
+                case '6M':
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                    values = [baseValue, baseValue * 1.12, baseValue * 0.95, baseValue * 1.18, baseValue * 1.22, baseValue * 1.35];
+                    break;
+                case '1Y':
+                    labels = ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'];
+                    values = [baseValue, baseValue * 1.15, baseValue * 0.88, baseValue * 1.25, baseValue * 1.45, baseValue * 1.62];
+                    break;
+            }
+            
+            portfolioChart.data.labels = labels;
+            portfolioChart.data.datasets[0].data = values;
+            portfolioChart.update();
+        }
+        
+        function showSampleHistoricalData(period) {
+            console.log('Loading REAL historical data for period:', period);
+            
+            // First try to fetch real data
+            fetchRealHistoricalData(period);
+        }
+        
+        function fetchRealHistoricalData(period) {
+            // Get symbols from user's actual portfolio positions
+            const portfolioStocks = getPortfolioStocks();
+            const symbols = portfolioStocks.length > 0 ? portfolioStocks.join(',') : 'AAPL,MSFT,GOOGL'; // fallback
+            
+            fetch(`/api/real-historical-data/?period=${period}&symbols=${symbols}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error || !data.datasets || data.datasets.length === 0) {
+                        console.log('Real data not available, falling back to simulated data');
+                        showSimulatedHistoricalData(period);
+                        return;
+                    }
+                    
+                    console.log('Using REAL Yahoo Finance data:', data);
+                    
+                    // Update chart configuration for percentage display
+                    portfolioChart.options.scales.y.beginAtZero = false;
+                    portfolioChart.options.scales.y.ticks.callback = function(value) {
+                        return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+                    };
+                    portfolioChart.options.plugins.legend.display = true;
+                    
+                    // Enhanced tooltip for real data - show both percentage and actual prices
+                    portfolioChart.options.plugins.tooltip.callbacks.label = function(context) {
+                        const stockSymbol = context.dataset.label;
+                        const price = context.parsed.y;
+                        const percentageChange = (price >= 0 ? '+' : '') + price.toFixed(2) + '%';
+                        
+                        // Check if we have actual price data from the dataset
+                        let actualPrice = null;
+                        const dataset = context.dataset;
+                        const dataIndex = context.dataIndex;
+                        
+                        if (dataset.actualPrices && dataset.actualPrices[dataIndex]) {
+                            // Use real historical price data
+                            const priceData = dataset.actualPrices[dataIndex];
+                            actualPrice = typeof priceData === 'object' ? priceData.actual_price : priceData;
+                        }
+                        
+                        if (actualPrice !== null) {
+                            // Show real historical price
+                            const priceDisplay = '$' + parseFloat(actualPrice).toFixed(2);
+                            return stockSymbol + ': ' + percentageChange + ' (' + priceDisplay + ')';
+                        } else {
+                            // Fallback to percentage only
+                            return stockSymbol + ': ' + percentageChange;
+                        }
+                    };
+                    
+                    // Update the datasets to use centralized color function
+                    if (data.datasets && data.datasets.length > 0) {
+                        data.datasets.forEach(dataset => {
+                            const color = getStockColor(dataset.label);
+                            dataset.borderColor = color;
+                            dataset.pointBackgroundColor = color;
+                        });
+                    }
+                    
+                    // Update the chart with real data
+                    portfolioChart.data.labels = data.labels;
+                    portfolioChart.data.datasets = data.datasets;
+                    portfolioChart.update();
+                    
+                    console.log('Real historical chart updated successfully');
+                })
+                .catch(error => {
+                    console.error('Error fetching real historical data:', error);
+                    console.log('Falling back to simulated data');
+                    showSimulatedHistoricalData(period);
+                });
+        }
+        
+        function showSimulatedHistoricalData(period) {
+            console.log('Loading SIMULATED historical data for period:', period);
+            
+            // Get actual portfolio stocks and their realistic prices
+            const portfolioStocks = getPortfolioStocks();
+            
+            // Define realistic stock data based on actual portfolio or use defaults
+            let stockData;
+            if (portfolioStocks.length > 0) {
+                // Use actual portfolio stocks with realistic current prices
+                stockData = portfolioStocks.map(symbol => {
+                    let currentPrice;
+                    switch(symbol) {
+                        case 'BRK-B':
+                        case 'BRK.B':
+                            currentPrice = 485.31;
+                            break;
+                        case 'O':
+                            currentPrice = 59.01;
+                            break;
+                        case 'DE':
+                            currentPrice = 489.44;
+                            break;
+                        case 'GOOG':
+                        case 'GOOGL':
+                            currentPrice = 204.29;
+                            break;
+                        case 'AAPL':
+                            currentPrice = 175.50;
+                            break;
+                        case 'MSFT':
+                            currentPrice = 342.75;
+                            break;
+                        case 'TSLA':
+                            currentPrice = 248.50;
+                            break;
+                        case 'NVDA':
+                            currentPrice = 415.20;
+                            break;
+                        default:
+                            // Default price for unknown stocks
+                            currentPrice = 150.00;
+                    }
+                    return { symbol: symbol, currentPrice: currentPrice };
+                });
+            } else {
+                // Fallback to sample data if no portfolio stocks found
+                stockData = [
+                    { symbol: 'BRK-B', currentPrice: 485.31 },
+                    { symbol: 'O', currentPrice: 59.01 },
+                    { symbol: 'DE', currentPrice: 489.44 },
+                    { symbol: 'GOOG', currentPrice: 204.29 }
+                ];
+            }
+            
+            // Create time labels and data points based on period
+            let labels = [];
+            let dataPoints = [];
+            const now = new Date();
+            
+            switch(period) {
+                case '1D':
+                    // Full day from midnight to current time
+                    const currentHour = new Date().getHours();
+                    const currentMinute = new Date().getMinutes();
+                    
+                    // Generate hourly progression from 00:00 to current time
+                    for (let hour = 0; hour <= currentHour; hour++) {
+                        if (hour === currentHour && currentMinute < 30) {
+                            continue;
+                        }
+                        const timeLabel = hour === 0 ? '12:00 AM' : 
+                                         hour === 12 ? '12:00 PM' :
+                                         hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`;
+                        labels.push(timeLabel);
+                    }
+                    
+                    // Ensure we have at least a few data points
+                    if (labels.length < 3) {
+                        labels = ['12:00 AM', '3:00 AM', '6:00 AM'];
+                    }
+                    
+                    dataPoints = labels.length;
+                    break;
+                case '1W':
+                    // Last 5 business days with exact dates
+                    for (let i = 4; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        labels.push(date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+                    }
+                    dataPoints = 5;
+                    break;
+                case '1M':
+                    // Daily data for last 30 days (show every 3rd day for readability)
+                    for (let i = 30; i >= 0; i -= 3) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    }
+                    dataPoints = labels.length;
+                    break;
+                case '6M':
+                    // Weekly data for last 6 months (show every 2 weeks)
+                    for (let i = 26; i >= 0; i -= 2) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - (i * 7));
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    }
+                    dataPoints = labels.length;
+                    break;
+                case '1Y':
+                    // Monthly data for last year
+                    for (let i = 12; i >= 0; i--) {
+                        const date = new Date();
+                        date.setMonth(date.getMonth() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+                    }
+                    dataPoints = labels.length;
+                    break;
+                case '5Y':
+                    // Quarterly data for last 5 years (show every 3 months)
+                    for (let i = 60; i >= 0; i -= 3) {
+                        const date = new Date();
+                        date.setMonth(date.getMonth() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+                    }
+                    dataPoints = labels.length;
+                    break;
+                case '10Y':
+                    // Yearly data for last 10 years
+                    const current10Year = new Date().getFullYear();
+                    for (let year = current10Year - 9; year <= current10Year; year++) {
+                        labels.push(year.toString());
+                    }
+                    dataPoints = labels.length;
+                    break;
+                case '20Y':
+                    // Yearly data for last 20 years
+                    const current20Year = new Date().getFullYear();
+                    for (let year = current20Year - 19; year <= current20Year; year++) {
+                        labels.push(year.toString());
+                    }
+                    dataPoints = labels.length;
+                    break;
+            }
+            
+            console.log('Generated labels:', labels);
+            
+            // Generate realistic percentage-based datasets (like Google Finance)
+            const datasets = stockData.map((stock, stockIndex) => {
+                const percentageData = [];
+                
+                // Define realistic percentage ranges based on time period
+                const percentageRange = {
+                    '1D': { min: -3, max: 3 },      // Daily: ±3%
+                    '1W': { min: -8, max: 8 },      // Weekly: ±8%
+                    '1M': { min: -15, max: 15 },    // Monthly: ±15%
+                    '6M': { min: -30, max: 30 },    // 6 months: ±30%
+                    '1Y': { min: -40, max: 40 },    // Yearly: ±40%
+                    '5Y': { min: -60, max: 150 },   // 5 years: -60% to +150%
+                    '10Y': { min: -70, max: 300 },  // 10 years: -70% to +300%
+                    '20Y': { min: -80, max: 600 },  // 20 years: -80% to +600%
+                    'MAX': { min: -80, max: 500 }   // Max: -80% to +500%
+                };
+                
+                const range = percentageRange[period];
+                
+                // Start at 0% (baseline) for the first data point
+                percentageData.push(0);
+                
+                // Generate progressive percentage changes
+                let cumulativeChange = 0;
+                for (let i = 1; i < dataPoints; i++) {
+                    // Generate realistic step changes based on period
+                    let stepChange;
+                    switch(period) {
+                        case '1D':
+                            stepChange = (Math.random() - 0.5) * 0.8; // ±0.4% per 30min
+                            break;
+                        case '1W':
+                            stepChange = (Math.random() - 0.5) * 3; // ±1.5% per day
+                            break;
+                        case '1M':
+                            stepChange = (Math.random() - 0.5) * 6; // ±3% per 3 days
+                            break;
+                        case '6M':
+                            stepChange = (Math.random() - 0.5) * 8; // ±4% per 2 weeks
+                            break;
+                        case '1Y':
+                            stepChange = (Math.random() - 0.5) * 12; // ±6% per month
+                            break;
+                        case '5Y':
+                            stepChange = (Math.random() - 0.5) * 20; // ±10% per quarter
+                            break;
+                        case 'MAX':
+                            stepChange = (Math.random() - 0.5) * 40; // ±20% per year
+                            break;
+                        default:
+                            stepChange = (Math.random() - 0.5) * 2;
+                    }
+                    
+                    cumulativeChange += stepChange;
+                    
+                    // Keep within realistic bounds
+                    cumulativeChange = Math.max(range.min, Math.min(range.max, cumulativeChange));
+                    
+                    percentageData.push(Math.round(cumulativeChange * 100) / 100); // Round to 2 decimal places
+                }
+                
+                // Add slight positive bias for the final result (stocks tend to go up over time)
+                if (dataPoints > 5) {
+                    const finalBias = Math.random() * 2; // 0-2% positive bias
+                    percentageData[dataPoints - 1] += finalBias;
+                    percentageData[dataPoints - 1] = Math.round(percentageData[dataPoints - 1] * 100) / 100;
+                }
+                
+                console.log(`${stock.symbol} percentage changes:`, percentageData);
+                
+                return {
+                    label: stock.symbol,
+                    data: percentageData,
+                    borderColor: getStockColor(stock.symbol),
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 2,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: getStockColor(stock.symbol),
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 1
+                };
+            });
+            
+            console.log('Generated datasets:', datasets);
+            
+            // Update chart configuration for percentage display
+            portfolioChart.options.scales.y.beginAtZero = false;
+            portfolioChart.options.scales.y.ticks.callback = function(value) {
+                return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
+            };
+            portfolioChart.options.plugins.legend.display = true;
+            portfolioChart.options.plugins.tooltip.callbacks.label = function(context) {
+                const percentage = context.parsed.y;
+                return context.dataset.label + ': ' + (percentage >= 0 ? '+' : '') + percentage.toFixed(2) + '%';
+            };
+            
+            // Update the chart
+            portfolioChart.data.labels = labels;
+            portfolioChart.data.datasets = datasets;
+            portfolioChart.update();
+            
+            console.log('Chart updated successfully');
+        }
+        
+        // New function for realistic historical performance data (like inception chart)
+        function loadRealisticHistoricalData(period) {
+            console.log('Loading realistic historical performance data for period:', period);
+            
+            // Get actual portfolio stocks
+            const portfolioStocks = getPortfolioStocks();
+            const stocksToShow = portfolioStocks.length > 0 ? portfolioStocks : ['BRK-B', 'O', 'DE', 'GOOG'];
+            
+            // Generate appropriate time labels based on period
+            let labels = [];
+            let dataPointCount = 0;
+            
+            switch(period) {
+                case '1D':
+                    // Full day from midnight to current time
+                    const currentHour = new Date().getHours();
+                    const currentMinute = new Date().getMinutes();
+                    
+                    for (let hour = 0; hour <= currentHour; hour++) {
+                        if (hour === currentHour && currentMinute < 30) {
+                            continue;
+                        }
+                        const timeLabel = hour === 0 ? '12:00 AM' : 
+                                         hour === 12 ? '12:00 PM' :
+                                         hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`;
+                        labels.push(timeLabel);
+                    }
+                    
+                    if (labels.length < 3) {
+                        labels = ['12:00 AM', '3:00 AM', '6:00 AM'];
+                    }
+                    
+                    dataPointCount = labels.length;
+                    break;
+                case '1W':
+                    // 5 business days
+                    for (let i = 4; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        labels.push(date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+                    }
+                    dataPointCount = labels.length;
+                    break;
+                case '1M':
+                    // 4 weeks
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    dataPointCount = 4;
+                    break;
+                case '6M':
+                    // 6 months
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const currentMonth = new Date().getMonth();
+                    for (let i = 5; i >= 0; i--) {
+                        const monthIndex = (currentMonth - i + 12) % 12;
+                        labels.push(monthNames[monthIndex]);
+                    }
+                    dataPointCount = labels.length;
+                    break;
+                case '1Y':
+                    // 12 months
+                    for (let i = 11; i >= 0; i--) {
+                        const date = new Date();
+                        date.setMonth(date.getMonth() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+                    }
+                    dataPointCount = labels.length;
+                    break;
+                case '5Y':
+                    // 5 years (yearly points)
+                    const currentYear = new Date().getFullYear();
+                    for (let i = 4; i >= 0; i--) {
+                        labels.push((currentYear - i).toString());
+                    }
+                    dataPointCount = labels.length;
+                    break;
+                case '10Y':
+                    // 10 years (yearly points)
+                    const current10Year = new Date().getFullYear();
+                    for (let i = 9; i >= 0; i--) {
+                        labels.push((current10Year - i).toString());
+                    }
+                    dataPointCount = labels.length;
+                    break;
+                case '20Y':
+                    // 20 years (yearly points)
+                    const current20Year = new Date().getFullYear();
+                    for (let i = 19; i >= 0; i--) {
+                        labels.push((current20Year - i).toString());
+                    }
+                    dataPointCount = labels.length;
+                    break;
+            }
+            
+            // Create realistic sample datasets for each stock (similar to inception chart)
+            const sampleDatasets = stocksToShow.map((symbol, index) => {
+                const color = getStockColor(symbol);
+                
+                // Generate realistic performance data (percentage gains) - similar to inception chart
+                const performance = [];
+                
+                // All stocks start at 0% (baseline)
+                performance.push(0);
+                
+                // Generate realistic incremental changes based on period
+                for (let i = 1; i < dataPointCount; i++) {
+                    let maxChange;
+                    switch(period) {
+                        case '1D':
+                            maxChange = 3; // Max ±3% per day
+                            break;
+                        case '1W':
+                            maxChange = 8; // Max ±8% per week
+                            break;
+                        case '1M':
+                            maxChange = 15; // Max ±15% per month
+                            break;
+                        case '6M':
+                            maxChange = 25; // Max ±25% over 6 months
+                            break;
+                        case '1Y':
+                            maxChange = 40; // Max ±40% per year
+                            break;
+                        case '5Y':
+                            maxChange = 100; // Max ±100% over 5 years
+                            break;
+                        case '10Y':
+                            maxChange = 200; // Max ±200% over 10 years
+                            break;
+                        case '20Y':
+                            maxChange = 400; // Max ±400% over 20 years
+                            break;
+                        case 'MAX':
+                            maxChange = 150; // Max ±150% over max period
+                            break;
+                        default:
+                            maxChange = 20;
+                    }
+                    
+                    // Generate a random but realistic performance value
+                    // Add slight positive bias (stocks tend to go up over time)
+                    const randomPercentage = (Math.random() * maxChange * 2 - maxChange) + (Math.random() * 3); // Small positive bias
+                    
+                    // Ensure it's within reasonable bounds
+                    const clampedPercentage = Math.max(-maxChange, Math.min(maxChange, randomPercentage));
+                    
+                    performance.push(Math.round(clampedPercentage * 100) / 100); // Round to 2 decimal places
+                }
+                
+                return {
+                    label: symbol,
+                    data: performance,
+                    borderColor: color,
+                    backgroundColor: color + '20', // Add 20 for transparency
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                };
+            });
+            
+            console.log('Generated realistic historical datasets:', sampleDatasets);
+            
+            // Update the chart
+            portfolioChart.data.labels = labels;
+            portfolioChart.data.datasets = sampleDatasets;
+            portfolioChart.update();
+            
+            console.log('Realistic historical chart updated successfully');
+        }
+        
+        // Function to send portfolio name change to server
+        function changePortfolioOnServer(portfolioName) {
+            const formData = new FormData();
+            formData.append('portfolio_name', portfolioName);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            fetch('/change-portfolio/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to show the new portfolio data
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error changing portfolio:', error);
+            });
+        }
+        
+        // Function to switch to a different portfolio
+        function switchToPortfolio(portfolioName) {
+            changePortfolioOnServer(portfolioName);
+        }
+        
+        // Function to create a new portfolio
+        function createNewPortfolio() {
+            const newName = prompt('Enter name for new portfolio:', 'New Portfolio');
+            if (newName && newName.trim()) {
+                changePortfolioOnServer(newName.trim());
+            }
+        }
+        
+        // Helper function to get portfolio stocks from the page
+        function getPortfolioStocks() {
+            const positionRows = document.querySelectorAll('.position-row strong');
+            const stocks = [];
+            
+            positionRows.forEach(row => {
+                const symbol = row.textContent.trim();
+                // Filter out invalid symbols that contain dollar signs or are empty
+                if (symbol && !symbol.includes('$') && !stocks.includes(symbol)) {
+                    stocks.push(symbol);
+                }
+            });
+            
+            return stocks;
+        }
+        
+        // Centralized stock color assignment function
+        function getStockColor(symbol) {
+            // More varied color palette that complements the cyan theme
+            const stockColors = [
+                '#06b6d4',  // Primary cyan
+                '#f59e0b',  // Amber/Orange
+                '#8b5cf6',  // Purple
+                '#10b981',  // Emerald green
+                '#ef4444',  // Red
+                '#3b82f6',  // Blue
+                '#f97316',  // Orange
+                '#84cc16',  // Lime green
+                '#ec4899',  // Pink
+                '#6366f1',  // Indigo
+                '#14b8a6',  // Teal
+                '#a855f7'   // Violet
+            ];
+            
+            // Get all portfolio stocks in consistent order
+            const portfolioStocks = getPortfolioStocks();
+            const stocksToShow = portfolioStocks.length > 0 ? portfolioStocks : ['BRK-B', 'O', 'DE', 'GOOG'];
+            
+            // Find index of this symbol
+            const symbolIndex = stocksToShow.indexOf(symbol);
+            
+            if (symbolIndex !== -1) {
+                const colorIndex = symbolIndex % stockColors.length;
+                return stockColors[colorIndex];
+            }
+            
+            // Fallback color for unknown symbols
+            return '#666666';
+        }
+        
+        // Stock color legend functions removed to simplify interface
+        
+        // Stock selector functions for individual stock charts
+        function loadAvailableStocks() {
+            // Get available stocks from the positions data already loaded in the page
+            const positionRows = document.querySelectorAll('.position-row strong');
+            availableStocks = [];
+            
+            positionRows.forEach(row => {
+                const symbol = row.textContent.trim();
+                if (symbol && !availableStocks.includes(symbol)) {
+                    availableStocks.push(symbol);
+                }
+            });
+            
+            // If no stocks from positions, try to get from detailed holdings
+            if (availableStocks.length === 0) {
+                // Use sample stocks for demo
+                availableStocks = ['AAPL', 'MSFT', 'GOOGL'];
+            }
+            
+            // Setup stock selector buttons
+            setupStockSelector();
+            
+            // Select first stock by default
+            if (availableStocks.length > 0) {
+                selectStock(availableStocks[0]);
+            }
+        }
+        
+        function setupStockSelector() {
+            const stockButtonsContainer = document.getElementById('stockButtons');
+            stockButtonsContainer.innerHTML = '';
+            
+            availableStocks.forEach((symbol, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `btn btn-outline-primary stock-btn ${index === 0 ? 'active' : ''}`;
+                button.setAttribute('data-stock', symbol);
+                button.textContent = symbol;
+                button.onclick = () => selectStock(symbol);
+                
+                stockButtonsContainer.appendChild(button);
+            });
+        }
+        
+        function selectStock(symbol) {
+            // Update active button
+            document.querySelectorAll('.stock-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.stock === symbol) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            currentSelectedStock = symbol;
+            
+            // Load individual stock price chart
+            loadIndividualStockChart(symbol, currentPeriod);
+        }
+        
+        function loadIndividualStockChart(symbol, period) {
+            // Configure chart for stock prices
+            portfolioChart.options.scales.y.beginAtZero = false;
+            portfolioChart.options.scales.y.ticks.callback = function(value) {
+                return '$' + value.toFixed(2);
+            };
+            
+            // For individual stock charts, show only the company name in tooltip
+            portfolioChart.options.plugins.tooltip.callbacks.label = function(context) {
+                return symbol; // Only show company name, no price
+            };
+            
+            // Show loading indicator
+            const currentStockPrice = document.getElementById('currentStockPrice');
+            currentStockPrice.textContent = 'Loading...';
+            currentStockPrice.style.display = 'inline-block';
+            
+            // Fetch individual stock price data
+            fetch(`/chart-data/?period=${period}&chart_type=single&symbol=${encodeURIComponent(symbol)}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Individual stock chart data:', data);
+                    
+                    if (data.labels && data.datasets && data.datasets.length > 0) {
+                        // Use the first (and only) dataset
+                        const stockDataset = data.datasets[0];
+                        
+                        // Update current price display
+                        const latestPrice = stockDataset.data[stockDataset.data.length - 1];
+                        currentStockPrice.textContent = `$${latestPrice.toFixed(2)}`;
+                        currentStockPrice.className = 'badge bg-success';
+                        
+                        // Use the dataset directly from backend
+                        portfolioChart.data.labels = data.labels;
+                        portfolioChart.data.datasets = data.datasets;
+                    } else {
+                        // Show sample data for this stock
+                        showSampleIndividualStockData(symbol, period);
+                        currentStockPrice.textContent = 'Sample Data';
+                        currentStockPrice.className = 'badge bg-warning';
+                    }
+                    
+                    portfolioChart.update();
+                })
+                .catch(error => {
+                    console.error('Error fetching individual stock data:', error);
+                    // Show sample data on error
+                    showSampleIndividualStockData(symbol, period);
+                    currentStockPrice.textContent = 'Sample Data';
+                    currentStockPrice.className = 'badge bg-warning';
+                });
+        }
+        
+        function showSampleIndividualStockData(symbol, period) {
+            let labels;
+            let basePrice;
+            
+            // Set realistic base prices for different stocks
+            switch(symbol) {
+                case 'AAPL':
+                    basePrice = 175.50;
+                    break;
+                case 'MSFT':
+                    basePrice = 342.75;
+                    break;
+                case 'GOOGL':
+                    basePrice = 138.25;
+                    break;
+                case 'TSLA':
+                    basePrice = 248.50;
+                    break;
+                case 'NVDA':
+                    basePrice = 415.20;
+                    break;
+                default:
+                    basePrice = 150.00;
+            }
+            
+            switch(period) {
+                case '1D':
+                    // Full day progression
+                    const currentHour = new Date().getHours();
+                    labels = [];
+                    for (let hour = 0; hour <= currentHour; hour += 2) { // Every 2 hours for readability
+                        const timeLabel = hour === 0 ? '12:00 AM' : 
+                                         hour === 12 ? '12:00 PM' :
+                                         hour < 12 ? `${hour}:00 AM` : `${hour - 12}:00 PM`;
+                        labels.push(timeLabel);
+                    }
+                    if (labels.length < 3) {
+                        labels = ['12:00 AM', '6:00 AM', '12:00 PM'];
+                    }
+                    break;
+                case '1W':
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+                    break;
+                case '1M':
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    break;
+                case '6M':
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                    break;
+                case '1Y':
+                    labels = ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'];
+                    break;
+            }
+            
+            // Generate realistic price movement
+            let currentPrice = basePrice;
+            const data = [currentPrice];
+            
+            for (let i = 1; i < labels.length; i++) {
+                const randomChange = (Math.random() - 0.48) * 0.025; // ±2.5% change, slight positive bias
+                currentPrice = currentPrice * (1 + randomChange);
+                data.push(parseFloat(currentPrice.toFixed(2)));
+            }
+            
+            const dataset = {
+                label: symbol,
+                data: data,
+                borderColor: '#06b6d4',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#06b6d4',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2
+            };
+            
+            portfolioChart.data.labels = labels;
+            portfolioChart.data.datasets = [dataset];
+            portfolioChart.update();
+        }
+        
+        // Holdings Detail toggle function
+        function toggleHoldingsDetail() {
+            const holdingsDetailCard = document.getElementById('holdingsDetailCard');
+            const toggleBtn = document.getElementById('holdingsToggleBtn');
+            const isHoldingsVisible = holdingsDetailCard.style.display === 'block';
+            
+            if (isHoldingsVisible) {
+                // Hide holdings detail
+                holdingsDetailCard.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-table me-2"></i>Show Holdings Detail';
+                toggleBtn.className = 'btn btn-outline-secondary';
+            } else {
+                // Show holdings detail without hiding charts
+                holdingsDetailCard.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-table me-2"></i>Hide Holdings Detail';
+                toggleBtn.className = 'btn btn-primary';
+            }
+        }
+        
+        // Support Modal Functions
+        function openSupportModal() {
+            const supportModal = new bootstrap.Modal(document.getElementById('supportModal'));
+            resetSupportForm();
+            supportModal.show();
+        }
+        
+        function resetSupportForm() {
+            // Show form, hide success/error messages
+            document.getElementById('supportFormContainer').style.display = 'block';
+            document.getElementById('supportSuccessMessage').style.display = 'none';
+            document.getElementById('supportErrorMessage').style.display = 'none';
+            
+            // Reset form
+            document.getElementById('supportForm').reset();
+            document.getElementById('supportPriority').value = 'MEDIUM';
+            
+            // Reset button state
+            const submitBtn = document.querySelector('.support-submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Message';
+            submitBtn.disabled = false;
+        }
+        
+        function submitSupportForm(event) {
             event.preventDefault();
-            const form = event.target;
+            
+            const form = document.getElementById('supportForm');
+            const submitBtn = document.querySelector('.support-submit-btn');
             const formData = new FormData(form);
+            
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+            submitBtn.disabled = true;
             
             fetch(form.dataset.supportUrl, {
                 method: 'POST',
@@ -69,11 +2829,39 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.success ? 'Message sent successfully!' : 'Error: ' + data.message);
+                if (data.success) {
+                    // Show success message
+                    document.getElementById('supportFormContainer').style.display = 'none';
+                    document.getElementById('supportSuccessMessage').style.display = 'block';
+                    document.getElementById('supportReferenceId').textContent = data.support_id || 'Generated';
+                } else {
+                    // Show error message
+                    document.getElementById('supportFormContainer').style.display = 'none';
+                    document.getElementById('supportErrorMessage').style.display = 'block';
+                    document.getElementById('supportErrorText').textContent = data.message || 'An unexpected error occurred.';
+                }
             })
             .catch(error => {
-                alert('Network error: ' + error.message);
+                console.error('Error submitting support form:', error);
+                
+                // Show error message
+                document.getElementById('supportFormContainer').style.display = 'none';
+                document.getElementById('supportErrorMessage').style.display = 'block';
+                document.getElementById('supportErrorText').textContent = 'Network error. Please check your connection and try again.';
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Message';
+                submitBtn.disabled = false;
             });
+        }
+        
+        // Add event listener for support form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const supportForm = document.getElementById('supportForm');
+            if (supportForm) {
+                supportForm.addEventListener('submit', submitSupportForm);
+            }
         });
     </script>
 </body>

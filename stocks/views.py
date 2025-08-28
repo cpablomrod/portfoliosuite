@@ -11,7 +11,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from .models import Portfolio, Stock, StockPrice
+from .models import Portfolio, Stock, StockPrice, SupportMessage
 from .forms import AddTransactionForm, SimulationForm
 from .services import StockDataService, PortfolioAnalytics
 
@@ -1462,3 +1462,98 @@ def generate_portfolio_report(request):
     buffer.close()
     
     return response
+
+
+# Support Views
+@login_required
+@require_http_methods(["POST"])
+def create_support_message(request):
+    """Create a new support message"""
+    try:
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        priority = request.POST.get('priority', 'MEDIUM')
+        
+        # Validate input
+        if not subject:
+            return JsonResponse({
+                'success': False,
+                'message': 'Subject is required'
+            })
+        
+        if not message:
+            return JsonResponse({
+                'success': False,
+                'message': 'Message is required'
+            })
+        
+        if len(subject) > 200:
+            return JsonResponse({
+                'success': False,
+                'message': 'Subject must be 200 characters or less'
+            })
+        
+        # Create support message
+        support_message = SupportMessage.objects.create(
+            user=request.user,
+            subject=subject,
+            message=message,
+            priority=priority
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Support message submitted successfully! We will get back to you soon.',
+            'support_id': str(support_message.id)
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error submitting support message: {str(e)}'
+        })
+
+
+@login_required
+def get_user_support_messages(request):
+    """Get support messages for the current user"""
+    try:
+        messages = SupportMessage.objects.filter(user=request.user).order_by('-created_at')
+        
+        message_data = []
+        for msg in messages:
+            message_data.append({
+                'id': msg.id,
+                'subject': msg.subject,
+                'message': msg.message,
+                'priority': msg.priority,
+                'status': msg.status,
+                'admin_response': msg.admin_response,
+                'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M'),
+                'updated_at': msg.updated_at.strftime('%Y-%m-%d %H:%M'),
+                'resolved_at': msg.resolved_at.strftime('%Y-%m-%d %H:%M') if msg.resolved_at else None,
+                'admin_responder': msg.admin_responder.get_full_name() if msg.admin_responder else None
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'messages': message_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error retrieving messages: {str(e)}'
+        })
+
+
+@login_required
+def support_history(request):
+    """Show support message history page"""
+    messages = SupportMessage.objects.filter(user=request.user).order_by('-created_at')
+    
+    context = {
+        'support_messages': messages
+    }
+    
+    return render(request, 'stocks/support_history.html', context)

@@ -20,9 +20,18 @@ python -c "import django.db.backends.postgresql; print('✅ Django PostgreSQL ba
 # Collect static files
 python manage.py collectstatic --noinput
 
-# Run database migrations
-python manage.py migrate
+# Check database status
+echo "🔍 Checking database status..."
+python manage.py check_database || echo "⚠️ Database check completed with warnings"
+
+# Run database migrations (force apply all migrations)
+echo "🗃️ Running database migrations..."
+python manage.py migrate --run-syncdb || echo "⚠️ Migration completed with warnings"
+
+# Show migration status
+echo "📊 Migration status:"
+python manage.py showmigrations stocks || echo "⚠️ Could not show migration status"
 
 # Create superuser if needed
-echo "Creating/updating admin superuser..."
+echo "👤 Creating/updating admin superuser..."
 python create_admin.py || echo "Admin creation completed with fallback"

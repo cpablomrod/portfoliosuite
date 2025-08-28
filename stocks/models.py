@@ -118,3 +118,75 @@ class LoginAttempt(models.Model):
         """Clear login attempts for a user (called on successful login)"""
         cutoff_time = timezone.now() - timedelta(hours=1)
         cls.objects.filter(username=username, timestamp__lt=cutoff_time).delete()
+
+
+class SupportMessage(models.Model):
+    """Model to store user support messages for admin review"""
+    STATUS_CHOICES = [
+        ('OPEN', 'Open'),
+        ('IN_PROGRESS', 'In Progress'),
+        ('RESOLVED', 'Resolved'),
+        ('CLOSED', 'Closed'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('URGENT', 'Urgent'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_messages', help_text="User who submitted the support message")
+    subject = models.CharField(max_length=200, help_text="Brief subject line for the support message")
+    message = models.TextField(help_text="Detailed description of the issue or question")
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM', help_text="Priority level of the support request")
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='OPEN', help_text="Current status of the support request")
+    admin_response = models.TextField(blank=True, help_text="Admin's response to the support message")
+    admin_responder = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='admin_responses', help_text="Admin who responded to this message")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    resolved_at = models.DateTimeField(null=True, blank=True, help_text="When the support request was resolved")
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['priority', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.subject} ({self.status})"
+    
+    def save(self, *args, **kwargs):
+        """Override save to set resolved_at when status changes to resolved"""
+        if self.status in ['RESOLVED', 'CLOSED'] and not self.resolved_at:
+            self.resolved_at = timezone.now()
+        super().save(*args, **kwargs)
+    
+    @property
+    def response_time(self):
+        """Calculate response time if admin has responded"""
+        if self.admin_response and self.updated_at:
+            return self.updated_at - self.created_at
+        return None
+    
+    @property
+    def is_overdue(self):
+        """Check if support request is overdue based on priority"""
+        if self.status in ['RESOLVED', 'CLOSED']:
+            return False
+        
+        now = timezone.now()
+        time_diff = now - self.created_at
+        
+        # Define SLA times based on priority
+        sla_hours = {
+            'URGENT': 2,
+            'HIGH': 8,
+            'MEDIUM': 24,
+            'LOW': 72
+        }
+        
+        max_hours = sla_hours.get(self.priority, 24)
+        return time_diff.total_seconds() > (max_hours * 3600)
