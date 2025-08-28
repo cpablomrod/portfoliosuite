@@ -27,6 +27,9 @@ python manage.py migrate || {
     python manage.py migrate --run-syncdb || echo "❌ All migration attempts failed but continuing..."
 }
 
-# Create superuser (ultra simple approach)
-echo "👤 Creating admin superuser..."
-python create_simple_admin.py || echo "Admin creation completed"
+# Create/reset admin user with direct database approach
+echo "👤 Resetting admin password with direct database access..."
+python reset_admin_db.py || {
+    echo "⚠️ Direct database reset failed, trying simple approach..."
+    python create_simple_admin.py || echo "Admin creation completed"
+}
