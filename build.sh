@@ -30,3 +30,7 @@ python manage.py migrate || {
 # Create superuser (simplified approach)
 echo "👤 Creating/updating admin superuser..."
 python create_admin.py || echo "Admin creation completed"
+
+# Reset admin password to known value
+echo "🔑 Resetting admin password to known value..."
+python manage.py reset_admin_password --password="Admin2025Portfolio!" || echo "Password reset completed"
