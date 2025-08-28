@@ -20,6 +20,16 @@ def create_admin():
     email = 'admin@portfoliosuite.com'
     password = 'PortfolioAdmin2025!'
     
+    # Test database connection first
+    from django.db import connection
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        print("✅ Database connection successful")
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
+    
     try:
         # Always try to get or create the user
         user, created = User.objects.get_or_create(

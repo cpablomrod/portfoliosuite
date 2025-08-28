@@ -27,6 +27,9 @@ python manage.py migrate || {
     python manage.py migrate --run-syncdb || echo "❌ All migration attempts failed but continuing..."
 }
 
-# Create superuser with forced password reset
+# Create superuser with forced password reset (using Django management command)
 echo "👤 Creating/updating admin superuser with new password..."
-python create_admin.py || echo "Admin creation completed"
+python manage.py reset_admin_password --username="admin" --password="PortfolioAdmin2025!" || {
+    echo "⚠️ Management command failed, trying standalone script..."
+    python create_admin.py || echo "Admin creation completed with fallback"
+}
