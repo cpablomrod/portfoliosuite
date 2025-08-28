@@ -18,9 +18,23 @@ def create_admin():
     password = 'admin123'
     
     try:
-        if User.objects.filter(username=username).exists():
-            # Update existing user
-            user = User.objects.get(username=username)
+        # Always try to get or create the user
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={
+                'email': email,
+                'is_staff': True,
+                'is_superuser': True,
+                'is_active': True,
+            }
+        )
+        
+        if created:
+            user.set_password(password)
+            user.save()
+            print(f"✅ CREATED superuser {username} with all permissions")
+        else:
+            # Update existing user to ensure all permissions are set
             user.is_staff = True
             user.is_superuser = True
             user.is_active = True
@@ -28,10 +42,6 @@ def create_admin():
             user.set_password(password)
             user.save()
             print(f"✅ UPDATED {username} to superuser with staff permissions")
-        else:
-            # Create new superuser
-            user = User.objects.create_superuser(username, email, password)
-            print(f"✅ CREATED superuser {username}")
         
         # Verify
         user = User.objects.get(username=username)
