@@ -27,17 +27,6 @@ python manage.py migrate || {
     python manage.py migrate --run-syncdb || echo "❌ All migration attempts failed but continuing..."
 }
 
-# Check database status (non-critical)
-echo "🔍 Checking database status..."
-python manage.py check_database 2>/dev/null || echo "⚠️ Database check skipped (command may not be available yet)"
-
-# Show migration status (non-critical)
-echo "📊 Migration status:"
-python manage.py showmigrations stocks 2>/dev/null || echo "⚠️ Could not show migration status"
-
-# Create/fix superuser (try both methods)
+# Create superuser (simplified approach)
 echo "👤 Creating/updating admin superuser..."
-python create_admin.py || echo "Standard admin creation completed"
-
-echo "🔧 Ensuring admin permissions are correct..."
-python manage.py fix_admin 2>/dev/null || echo "⚠️ Admin fix command skipped"
+python create_admin.py || echo "Admin creation completed"

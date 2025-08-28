@@ -6,11 +6,14 @@ Run this with: python create_admin.py
 import os
 import django
 
-# Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_tracker.settings_render_free')
-django.setup()
-
-from django.contrib.auth.models import User
+# Setup Django with error handling
+try:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio_tracker.settings_render_free')
+    django.setup()
+    from django.contrib.auth.models import User
+except Exception as e:
+    print(f"❌ Django setup failed: {e}")
+    exit(1)
 
 def create_admin():
     username = 'admin'
