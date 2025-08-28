@@ -242,9 +242,10 @@
         }
         
         .support-button {
-            width: 38px;
+            width: auto;
+            min-width: 38px;
             height: 38px;
-            border-radius: 50%;
+            border-radius: 19px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
@@ -255,6 +256,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border: 2px solid rgba(16, 185, 129, 0.2);
+            padding: 0 15px;
+            white-space: nowrap;
         }
         
         .support-button:hover {
@@ -600,9 +603,10 @@
 <body class="no-scroll" style="background-color: #0f172a !important; color: #e2e8f0 !important;">
     <!-- User Menu in upper right corner -->
     <div class="user-menu">
-        <!-- Contact Support Button -->
-        <button class="support-button" onclick="openSupportModal()" title="Contact Support">
-            <i class="fas fa-headset"></i>
+        <!-- Contact Support Button with text -->
+        <button class="support-button d-flex align-items-center" onclick="openSupportModal()" title="Contact Support">
+            <i class="fas fa-headset me-2"></i>
+            <span class="support-text">Contact Support</span>
         </button>
         
         <div class="dropdown">
@@ -616,6 +620,9 @@
                 </li>
                 <li><a class="dropdown-item" href="{% url 'change_user' %}">
                     <i class="fas fa-user-edit"></i>Change User
+                </a></li>
+                <li><a class="dropdown-item" href="{% url 'support_history' %}">
+                    <i class="fas fa-life-ring"></i>Support Requests
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="{% url 'goodbye' %}">
