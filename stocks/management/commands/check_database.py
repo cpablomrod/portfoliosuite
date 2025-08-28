@@ -24,16 +24,25 @@ class Command(BaseCommand):
         stock_models = apps.get_app_config('stocks').get_models()
         
         with connection.cursor() as cursor:
-            # Get all table names
-            cursor.execute("""
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-            """ if connection.vendor == 'postgresql' else """
-                SELECT name 
-                FROM sqlite_master 
-                WHERE type='table'
-            """)
+            # Get all table names with error handling
+            try:
+                if connection.vendor == 'postgresql':
+                    cursor.execute("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                    """)
+                else:
+                    cursor.execute("""
+                        SELECT name 
+                        FROM sqlite_master 
+                        WHERE type='table'
+                    """)
+            except Exception as e:
+                self.stdout.write(
+                    self.style.ERROR(f'❌ Failed to query table names: {e}')
+                )
+                return
             
             existing_tables = [row[0] for row in cursor.fetchall()]
             self.stdout.write(f'📋 Found {len(existing_tables)} tables in database')
