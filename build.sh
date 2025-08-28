@@ -27,10 +27,6 @@ python manage.py migrate || {
     python manage.py migrate --run-syncdb || echo "❌ All migration attempts failed but continuing..."
 }
 
-# Create superuser (simplified approach)
-echo "👤 Creating/updating admin superuser..."
+# Create superuser with forced password reset
+echo "👤 Creating/updating admin superuser with new password..."
 python create_admin.py || echo "Admin creation completed"
-
-# Reset admin password to known value
-echo "🔑 Resetting admin password to known value..."
-python manage.py reset_admin_password --password="Admin2025Portfolio!" || echo "Password reset completed"

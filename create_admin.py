@@ -18,7 +18,7 @@ except Exception as e:
 def create_admin():
     username = 'admin'
     email = 'admin@portfoliosuite.com'
-    password = 'admin123'
+    password = 'PortfolioAdmin2025!'
     
     try:
         # Always try to get or create the user
@@ -67,6 +67,6 @@ if __name__ == '__main__':
         print("\n🎉 Admin user ready!")
         print("You can now login at /admin/ with:")
         print("Username: admin")
-        print("Password: admin123")
+        print("Password: PortfolioAdmin2025!")
     else:
         print("\n❌ Failed to create admin user")
