@@ -39,6 +39,10 @@ urlpatterns = [
     path('debug-login/', debug_login_status, name='debug_login'),
     path('debug-lockout/', debug_lockout_view, name='debug_lockout'),
     
+    # Admin Health URLs
+    path('admin-health/', views.admin_health_check, name='admin_health_check'),
+    path('reset-admin-simple/', views.reset_admin_simple, name='reset_admin_simple'),
+    
     # Support URLs
     path('support/create/', views.create_support_message, name='create_support_message'),
     path('support/messages/', views.get_user_support_messages, name='get_user_support_messages'),
