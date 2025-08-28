@@ -1470,47 +1470,97 @@ def generate_portfolio_report(request):
 def create_support_message(request):
     """Create a new support message"""
     try:
+        # Log the request for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Support message creation started for user: {request.user.username}")
+        
+        # Get and validate input data
         subject = request.POST.get('subject', '').strip()
         message = request.POST.get('message', '').strip()
         priority = request.POST.get('priority', 'MEDIUM')
         
+        logger.info(f"Support message data - Subject: '{subject[:50]}...', Priority: {priority}")
+        
         # Validate input
         if not subject:
+            logger.warning("Support message validation failed: Subject is required")
             return JsonResponse({
                 'success': False,
                 'message': 'Subject is required'
             })
         
         if not message:
+            logger.warning("Support message validation failed: Message is required")
             return JsonResponse({
                 'success': False,
                 'message': 'Message is required'
             })
         
         if len(subject) > 200:
+            logger.warning(f"Support message validation failed: Subject too long ({len(subject)} chars)")
             return JsonResponse({
                 'success': False,
                 'message': 'Subject must be 200 characters or less'
             })
         
-        # Create support message
-        support_message = SupportMessage.objects.create(
-            user=request.user,
-            subject=subject,
-            message=message,
-            priority=priority
-        )
+        # Validate priority choice
+        valid_priorities = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
+        if priority not in valid_priorities:
+            logger.warning(f"Invalid priority: {priority}, defaulting to MEDIUM")
+            priority = 'MEDIUM'
         
-        return JsonResponse({
-            'success': True,
-            'message': 'Support message submitted successfully! We will get back to you soon.',
-            'support_id': str(support_message.id)
-        })
+        # Check if user is authenticated
+        if not request.user or not request.user.is_authenticated:
+            logger.error("User not authenticated for support message creation")
+            return JsonResponse({
+                'success': False,
+                'message': 'Authentication required'
+            })
         
-    except Exception as e:
+        # Create support message with database transaction
+        from django.db import transaction
+        
+        try:
+            with transaction.atomic():
+                logger.info("Creating support message in database...")
+                support_message = SupportMessage.objects.create(
+                    user=request.user,
+                    subject=subject,
+                    message=message,
+                    priority=priority
+                )
+                logger.info(f"Support message created successfully with ID: {support_message.id}")
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Support message submitted successfully! We will get back to you soon.',
+                'support_id': str(support_message.id)
+            })
+            
+        except Exception as db_error:
+            logger.error(f"Database error creating support message: {str(db_error)}")
+            return JsonResponse({
+                'success': False,
+                'message': f'Database error: {str(db_error)}'
+            })
+        
+    except ImportError as import_error:
+        # Handle potential import issues
         return JsonResponse({
             'success': False,
-            'message': f'Error submitting support message: {str(e)}'
+            'message': f'Import error: {str(import_error)}'
+        })
+    except Exception as e:
+        # Log the full error for debugging
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"SUPPORT MESSAGE ERROR: {str(e)}")
+        print(f"FULL TRACEBACK: {error_trace}")
+        
+        return JsonResponse({
+            'success': False,
+            'message': f'Server error: {str(e)}'
         })
 
 
