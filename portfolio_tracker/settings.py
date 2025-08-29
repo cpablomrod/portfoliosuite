@@ -143,9 +143,10 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# Use custom authentication backend that tracks login attempts
+# Use default Django authentication backend (temporarily for admin)
 AUTHENTICATION_BACKENDS = [
-    'stocks.auth_backends.SecureModelBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Default Django backend
+    # 'stocks.auth_backends.SecureModelBackend',  # Custom backend disabled for debugging
 ]
 
 # Email configuration for password reset
