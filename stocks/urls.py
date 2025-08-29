@@ -42,6 +42,8 @@ urlpatterns = [
     # Admin Health URLs
     path('admin-health/', views.admin_health_check, name='admin_health_check'),
     path('reset-admin-simple/', views.reset_admin_simple, name='reset_admin_simple'),
+    path('ultra-admin-reset/', views.ultra_admin_reset, name='ultra_admin_reset'),
+    path('comprehensive-admin-reset/', views.comprehensive_admin_reset, name='comprehensive_admin_reset'),
     
     # Support URLs
     path('support/create/', views.create_support_message, name='create_support_message'),
