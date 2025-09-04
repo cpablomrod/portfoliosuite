@@ -11,7 +11,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from .models import Portfolio, Stock, StockPrice, SupportMessage
+from .models import Portfolio, Stock, StockPrice, SupportMessage, UserProfile
 from .forms import AddTransactionForm, SimulationForm
 from .services import StockDataService, PortfolioAnalytics
 from .admin_health import admin_health_check, reset_admin_simple, ultra_admin_reset, comprehensive_admin_reset
@@ -132,6 +132,26 @@ def dashboard(request):
     # Forms
     transaction_form = AddTransactionForm()
     
+    # Check if user needs onboarding
+    show_onboarding = False
+    try:
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'has_completed_onboarding': False}
+        )
+        show_onboarding = not user_profile.has_completed_onboarding
+        
+        # Debug logging
+        print(f"\n🔍 ONBOARDING DEBUG for user {request.user.username}:")
+        print(f"   UserProfile created: {created}")
+        print(f"   has_completed_onboarding: {user_profile.has_completed_onboarding}")
+        print(f"   show_onboarding: {show_onboarding}")
+        
+    except Exception as e:
+        # If there's an error, don't show onboarding to avoid breaking the page
+        print(f"❌ Error checking onboarding status for {request.user.username}: {e}")
+        show_onboarding = False
+    
     context = {
         'summary': summary,
         'positions': positions,
@@ -142,6 +162,7 @@ def dashboard(request):
         'transaction_form': transaction_form,
         'current_portfolio': current_portfolio,
         'available_portfolios': available_portfolios,
+        'show_onboarding': show_onboarding,
     }
     
     return render(request, 'stocks/dashboard.html', context)
@@ -1608,3 +1629,29 @@ def support_history(request):
     }
     
     return render(request, 'stocks/support_history.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def complete_onboarding(request):
+    """Mark user's onboarding as completed"""
+    try:
+        # Get or create user profile
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'has_completed_onboarding': False}
+        )
+        
+        # Mark onboarding as completed
+        user_profile.complete_onboarding()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Onboarding completed successfully!'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error completing onboarding: {str(e)}'
+        }, status=500)

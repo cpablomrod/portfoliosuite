@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from django import forms
-from .models import LoginAttempt
+from .models import LoginAttempt, UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
@@ -121,6 +121,17 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
+            
+            # Create UserProfile for the new user
+            try:
+                UserProfile.objects.create(
+                    user=user,
+                    has_completed_onboarding=False
+                )
+            except Exception as e:
+                # Log the error but don't prevent registration
+                print(f"Error creating UserProfile for {username}: {e}")
+            
             messages.success(request, f'Account created for {username}! You can now log in.')
             login(request, user)  # Automatically log in the user
             return redirect('dashboard')

@@ -120,6 +120,27 @@ class LoginAttempt(models.Model):
         cls.objects.filter(username=username, timestamp__lt=cutoff_time).delete()
 
 
+class UserProfile(models.Model):
+    """Extended user profile to track additional user preferences and status"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    has_completed_onboarding = models.BooleanField(default=False, help_text="Whether the user has completed the initial onboarding process")
+    onboarding_completed_at = models.DateTimeField(null=True, blank=True, help_text="When the user completed onboarding")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - Profile"
+    
+    def complete_onboarding(self):
+        """Mark onboarding as completed"""
+        self.has_completed_onboarding = True
+        self.onboarding_completed_at = timezone.now()
+        self.save()
+
+
 class SupportMessage(models.Model):
     """Model to store user support messages for admin review"""
     STATUS_CHOICES = [
