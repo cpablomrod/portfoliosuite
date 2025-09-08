@@ -177,6 +177,14 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
+# Session Security Settings (apply to all environments)
+SESSION_COOKIE_NAME = 'portfolio_sessionid'  # Unique session cookie name
+SESSION_COOKIE_AGE = 86400  # 24 hours (in seconds)
+SESSION_SAVE_EVERY_REQUEST = True  # Refresh session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Don't expire when browser closes
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+
 # Additional security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -186,6 +194,10 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+    SESSION_COOKIE_SAMESITE = 'Strict'  # Stricter for production
+else:
+    # Development-specific session settings
+    SESSION_COOKIE_SECURE = False  # Allow HTTP in development
 
 # Buffer Overflow Protection Settings
 MAX_REQUEST_SIZE = 10 * 1024 * 1024  # 10MB max request size

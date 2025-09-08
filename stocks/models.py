@@ -125,6 +125,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     has_completed_onboarding = models.BooleanField(default=False, help_text="Whether the user has completed the initial onboarding process")
     onboarding_completed_at = models.DateTimeField(null=True, blank=True, help_text="When the user completed onboarding")
+    current_portfolio = models.CharField(max_length=100, default='My Investment Portfolio', help_text="Currently selected portfolio name for this user")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

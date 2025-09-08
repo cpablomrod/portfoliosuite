@@ -17,11 +17,44 @@ from .services import StockDataService, PortfolioAnalytics
 from .admin_health import admin_health_check, reset_admin_simple, ultra_admin_reset, comprehensive_admin_reset
 
 
+def get_user_current_portfolio(user):
+    """Safely get the current portfolio for a user from their profile"""
+    try:
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                'has_completed_onboarding': False,
+                'current_portfolio': 'My Investment Portfolio'
+            }
+        )
+        return user_profile.current_portfolio
+    except Exception:
+        # Fallback to default if there's any error
+        return 'My Investment Portfolio'
+
+
+def set_user_current_portfolio(user, portfolio_name):
+    """Safely set the current portfolio for a user in their profile"""
+    try:
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                'has_completed_onboarding': False,
+                'current_portfolio': portfolio_name
+            }
+        )
+        user_profile.current_portfolio = portfolio_name
+        user_profile.save()
+        return True
+    except Exception:
+        return False
+
+
 @login_required
 def dashboard(request):
     """Main dashboard view"""
-    # Get current portfolio name from session or use default
-    current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+    # Get current portfolio name from user profile (database) instead of session
+    current_portfolio = get_user_current_portfolio(request.user)
     
     # Get portfolio summary for current portfolio (filtered by user)
     summary = PortfolioAnalytics.get_portfolio_summary(current_portfolio, request.user)
@@ -175,8 +208,8 @@ def add_transaction(request):
     try:
         form = AddTransactionForm(request.POST)
         if form.is_valid():
-            # Get current portfolio name from session
-            current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+            # Get current portfolio name from user profile (database)
+            current_portfolio = get_user_current_portfolio(request.user)
             transaction = form.save(portfolio_name=current_portfolio, user=request.user)
             messages.success(request, f'Transaction added: {transaction.transaction_type} {transaction.quantity} {transaction.stock.symbol}')
         else:
@@ -341,8 +374,8 @@ def chart_data(request):
     symbol = request.GET.get('symbol', None)  # Get the symbol parameter
     
     try:
-        # Get current portfolio name from session
-        current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+        # Get current portfolio name from user profile (database)
+        current_portfolio = get_user_current_portfolio(request.user)
         
         # Get all stocks in current portfolio (filtered by user)
         positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
@@ -885,8 +918,8 @@ def _get_sample_chart_data(period, chart_type='portfolio', symbol=None):
 def performance_since_inception_data(request):
     """Provide performance data for individual stocks since their inception in portfolio"""
     try:
-        # Get current portfolio name from session
-        current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+        # Get current portfolio name from user profile (database)
+        current_portfolio = get_user_current_portfolio(request.user)
         
         # Get current positions (filtered by user)
         positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
@@ -1211,8 +1244,8 @@ def get_stock_price(request):
 def sector_allocation_data(request):
     """Provide sector allocation data for pie chart"""
     try:
-        # Get current portfolio name from session
-        current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+        # Get current portfolio name from user profile (database)
+        current_portfolio = get_user_current_portfolio(request.user)
         
         # Get current positions (filtered by user)
         positions = PortfolioAnalytics.get_stock_positions(current_portfolio, request.user)
@@ -1334,9 +1367,11 @@ def change_portfolio(request):
         if not new_portfolio_name:
             messages.error(request, 'Portfolio name cannot be empty')
         else:
-            # Update session with new portfolio name
-            request.session['current_portfolio'] = new_portfolio_name
-            messages.success(request, f'Switched to portfolio: {new_portfolio_name}')
+            # Update user profile with new portfolio name (database instead of session)
+            if set_user_current_portfolio(request.user, new_portfolio_name):
+                messages.success(request, f'Switched to portfolio: {new_portfolio_name}')
+            else:
+                messages.error(request, 'Error updating portfolio selection')
     
     return redirect('dashboard')
 
@@ -1344,8 +1379,8 @@ def change_portfolio(request):
 @login_required
 def generate_portfolio_report(request):
     """Generate PDF report of portfolio transactions"""
-    # Get current portfolio name from session
-    current_portfolio = request.session.get('current_portfolio', 'My Investment Portfolio')
+    # Get current portfolio name from user profile (database)
+    current_portfolio = get_user_current_portfolio(request.user)
     
     # Get all transactions for current portfolio (filtered by user)
     transactions = Portfolio.objects.filter(user=request.user, portfolio_name=current_portfolio).select_related('stock').order_by('-transaction_date', '-created_at')
